@@ -1,3 +1,4 @@
+const FeesRecord = require('../models/FeesRecord');
 const Student = require('../models/Student');
 
 const resolvers = {
