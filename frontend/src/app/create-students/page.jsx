@@ -3,18 +3,9 @@ import { useForm } from "react-hook-form";
 import { useState } from "react";
 import client from "@/utils/graphql";
 import { Button } from "@nextui-org/react";
-
-const CREATE_STUDENT_MUTATION = `
-  mutation CreateStudent($name: String!, $joiningDate: String!, $contactInfo: String!, $class: String!, $timeSlot: String!) {
-    createStudent(name: $name, joiningDate: $joiningDate, contactInfo: $contactInfo, class: $class, timeSlot: $timeSlot) {
-      id
-      name
-      contactInfo
-      class
-      timeSlot
-    }
-  }
-`;
+import { CREATE_STUDENT_MUTATION } from "@/queries/graphqlQueires";
+import {  useNotifyAndNavigate } from "@/utils/notify_and_navigate";
+import { useRouter } from "next/navigation";
 
 const CreateStudentPage = () => {
   const {
@@ -23,13 +14,14 @@ const CreateStudentPage = () => {
     formState: { errors },
   } = useForm();
   const [message, setMessage] = useState("");
+  const notifyAndNavigate = useNotifyAndNavigate();
 
   const onSubmit = async (data) => {
     try {
-      const response = await client.request(CREATE_STUDENT_MUTATION, data);
-      setMessage(
-        `Student ${response.createStudent.name} created successfully!`
-      );
+      const response = await client.request(CREATE_STUDENT_MUTATION, {
+        input: data,
+      });
+      notifyAndNavigate( "Student created successfully", "/");
     } catch (error) {
       setMessage(`Error: ${error.message}`);
     }
@@ -106,23 +98,35 @@ const CreateStudentPage = () => {
         </div>
 
         <div>
-          <label htmlFor="timeSlot" className="block">Time Slot:</label>
+          <label htmlFor="timeSlot" className="block">
+            Time Slot:
+          </label>
           <select
             id="timeSlot"
-            {...register('timeSlot', { required: true })}
-            className={`border p-2 w-full text-black ${errors.timeSlot ? 'border-red-500' : 'border-gray-300'}`}
+            {...register("timeSlot", { required: true })}
+            className={`border p-2 w-full text-black ${
+              errors.timeSlot ? "border-red-500" : "border-gray-300"
+            }`}
           >
             <option value="">Select Time Slot</option>
             {/* Time slots from 7 AM to 9 PM in 12-hour format */}
             {Array.from({ length: 14 }, (_, index) => {
               const hour = 7 + index;
-              const ampm = hour < 12 ? 'AM' : 'PM';
+              const ampm = hour < 12 ? "AM" : "PM";
               const displayHour = hour % 12 === 0 ? 12 : hour % 12; // Convert to 12-hour format
-              const timeSlot = `${displayHour}-${(displayHour % 12) + 1} ${ampm}`;
-              return <option key={index} value={timeSlot}>{timeSlot}</option>;
+              const timeSlot = `${displayHour} - ${
+                (displayHour % 12) + 1
+              } ${ampm}`;
+              return (
+                <option key={index} value={timeSlot}>
+                  {timeSlot}
+                </option>
+              );
             })}
           </select>
-          {errors.timeSlot && <p className="text-red-500">Time Slot is required</p>}
+          {errors.timeSlot && (
+            <p className="text-red-500">Time Slot is required</p>
+          )}
         </div>
 
         <Button

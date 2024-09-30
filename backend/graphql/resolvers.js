@@ -32,20 +32,18 @@ const resolvers = {
     },
   },
   Mutation: {
-    async createStudent(
-      _,
-      { name, joiningDate, contactInfo, class: className, timeSlot }
-    ) {
+    async createStudent(_, { input }) {
+      const { name, joiningDate, contactInfo, class: className, timeSlot } = input;
+    
       if (!name || !joiningDate || !contactInfo || !className || !timeSlot) {
-        throw new Error(
-          'All fields are required: name, joiningDate, contactInfo, class, timeSlot.'
-        );
+        throw new Error('All fields are required: name, joiningDate, contactInfo, class, timeSlot.');
       }
-
+    
       const contactRegex = /^\d{10}$/;
       if (!contactRegex.test(contactInfo)) {
         throw new Error('Contact info must be a 10-digit mobile number.');
       }
+    
       return await Student.create({
         name,
         joiningDate,
@@ -54,6 +52,7 @@ const resolvers = {
         timeSlot,
       });
     },
+    
 
     async updateStudent(
       _,
@@ -73,12 +72,16 @@ const resolvers = {
     },
 
     async deleteStudent(_, { id }) {
+      const feesRecords = await FeesRecord.findAll({ where: { studentId: id } });
+      await Promise.all(feesRecords.map(record => record.destroy()));
+    
       const student = await Student.findByPk(id);
       if (!student) throw new Error('Student not found');
-
+    
       await student.destroy();
       return `Student with id ${id} deleted successfully`;
     },
+    
 
     async createFeesRecord(_, { studentId, amount, month, year, status }) {
       return await FeesRecord.create({

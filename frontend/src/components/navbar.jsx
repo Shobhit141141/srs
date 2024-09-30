@@ -13,22 +13,26 @@ const CustomNavbar = () => {
 
   const navLinks = [
     { name: "Home", href: "/" },
-    { name: "Create Student", href: "/create-students" },
-    // Add more links as needed
+    { name: "Add Student", href: "/create-students" },
   ];
 
   return (
-    <nav className=" text-white">
-      <div className="container mx-auto flex justify-between items-center px-2 py-4">
-       
+    <nav className=" text-white px-4">
+      <div className=" mx-auto flex justify-between items-center px-2 py-4">
         <div className="flex items-center space-x-2">
-          <img src="/srs.png" alt="Logo" className="h-10 w-10 object-cover" />
+          <Link href="/">
+            <img src="/srs.png" alt="Logo" className="h-10 w-10 object-cover" />
+          </Link>
         </div>
         <div className="hidden md:flex space-x-4">
           {navLinks.map((link) => (
-            <a key={link.name} href={link.href} className="hover:text-gray-400">
+            <Link
+              key={link.name}
+              href={link.href}
+              className="hover:text-gray-400"
+            >
               {link.name}
-            </a>
+            </Link>
           ))}
         </div>
       </div>

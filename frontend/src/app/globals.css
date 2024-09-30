@@ -92,3 +92,7 @@ input {
 .max-z {
   z-index: 9999;
 }
+select{
+  color: black;
+  
+}

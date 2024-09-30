@@ -1,6 +1,7 @@
 import CustomNavbar from "@/components/navbar";
 import "./globals.css";
 import { NextUIProvider } from "@nextui-org/react";
+import { Toaster } from "react-hot-toast";
 
 export const metadata = {
   title: "Create Next App",
@@ -12,6 +13,7 @@ export default function RootLayout({ children }) {
     // <ApolloProvider>
     <html lang="en">
       <body className={``}>
+        <Toaster position="bottom-right"/>
         <CustomNavbar />
 
         {/* <ApolloProvider client={client}> */}

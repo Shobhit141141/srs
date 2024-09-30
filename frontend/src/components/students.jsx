@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import client from "@/utils/graphql"; // Adjust the path as necessary
 import Link from "next/link";
+import { Spinner } from "@nextui-org/react";
 
 const GET_ALL_STUDENTS_QUERY = `
   query {
@@ -28,7 +29,10 @@ const StudentsPage = () => {
     } catch (error) {
       setError(`Error fetching students: ${error.message}`);
     } finally {
-      setLoading(false);
+      // Wait for 1 second before setting loading to false
+      setTimeout(() => {
+        setLoading(false);
+      }, 1000);
     }
   };
 
@@ -36,7 +40,14 @@ const StudentsPage = () => {
     fetchStudents();
   }, []);
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center absolute top-1/2 left-1/2 -translate-x-[50%] -translate-y-[50%]">
+        <Spinner /> {/* You can also add a message here if needed */}
+        <p className="ml-2">Loading...</p>
+      </div>
+    );
+  }
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (

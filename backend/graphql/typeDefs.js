@@ -11,10 +11,6 @@ const typeDefs = gql`
     feesRecords: [FeesRecord!]!
   }
 
-  type Query {
-    studentsByTimeSlot(timeSlot: String!): [Student!]!
-  }
-
   type FeesRecord {
     id: ID!
     studentId: ID!
@@ -28,17 +24,19 @@ const typeDefs = gql`
     getStudentById(id: ID!): Student
     getAllStudents: [Student!]
     getFeesRecords(studentId: ID!): [FeesRecord!]
+    studentsByTimeSlot(timeSlot: String!): [Student!]!
+  }
+
+  input CreateStudentInput {
+    name: String!
+    joiningDate: String!
+    contactInfo: String!
+    class: String!
+    timeSlot: String!
   }
 
   type Mutation {
-    createStudent(
-      name: String!
-      joiningDate: String!
-      contactInfo: String!
-      class: String!
-      timeSlot: String!
-    ): Student
-
+    createStudent(input: CreateStudentInput!): Student
     updateStudent(
       id: ID!
       name: String
@@ -46,9 +44,7 @@ const typeDefs = gql`
       class: String
       timeSlot: String
     ): Student
-
     deleteStudent(id: ID!): String
-
     createFeesRecord(
       studentId: ID!
       amount: Float!
@@ -56,7 +52,6 @@ const typeDefs = gql`
       year: Int!
       status: String!
     ): FeesRecord
-
     updateFeesRecord(id: ID!, amount: Float, status: String): FeesRecord
   }
 `;

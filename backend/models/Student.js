@@ -5,11 +5,11 @@ const Student = sequelize.define(
   {
     name: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: false
     },
     joiningDate: {
       type: DataTypes.DATEONLY,
-      allowNull: false,
+      allowNull: false
     },
     contactInfo: {
       type: DataTypes.STRING,
@@ -17,22 +17,36 @@ const Student = sequelize.define(
       validate: {
         is: {
           args: /^\d{10}$/,
-          msg: 'Contact info must be a 10-digit mobile number.',
+          msg: 'Contact info must be a 10-digit mobile number.'
         },
         len: {
           args: [10, 10],
-          msg: 'Contact info must be 10 digits long.',
-        },
-      },
+          msg: 'Contact info must be 10 digits long.'
+        }
+      }
     },
     class: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: false
     },
     timeSlot: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
+      type: DataTypes.ENUM(
+        '7 - 8 AM',
+        '8 - 9 AM',
+        '9 - 10 AM',
+        '10 - 11 AM',
+        '11 - 12 PM',
+        '12 - 1 PM',
+        '1 - 2 PM',
+        '2 - 3 PM',
+        '3 - 4 PM',
+        '4 - 5 PM',
+        '5 - 6 PM',
+        '6 - 7 PM',
+        '7 - 8 PM'
+      ),
+      allowNull: false
+    }
   },
   {}
 );

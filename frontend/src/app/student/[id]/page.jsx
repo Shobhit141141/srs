@@ -1,51 +1,14 @@
 "use client";
-import { gql } from "graphql-request";
-import client from "@/utils/graphql"; // Adjust the path as necessary
+import client from "@/utils/graphql";
 import { useEffect, useState } from "react";
-
-const GET_STUDENT_BY_ID_QUERY = gql`
-  query GetStudentById($id: ID!) {
-    getStudentById(id: $id) {
-      id
-      name
-      contactInfo
-      class
-      timeSlot
-      joiningDate
-      feesRecords {
-        id
-        amount
-        month
-        year
-        status
-      }
-    }
-  }
-`;
-
-const CREATE_FEES_RECORD_MUTATION = gql`
-  mutation CreateFeesRecord(
-    $studentId: ID!
-    $amount: Float!
-    $month: String!
-    $year: Int!
-    $status: String!
-  ) {
-    createFeesRecord(
-      studentId: $studentId
-      amount: $amount
-      month: $month
-      year: $year
-      status: $status
-    ) {
-      id
-      amount
-      month
-      year
-      status
-    }
-  }
-`;
+import { Button } from "@nextui-org/react";
+import { TrashIcon } from "@radix-ui/react-icons";
+import {
+  CREATE_FEES_RECORD_MUTATION,
+  DELETE_STUDENT_MUTATION,
+  GET_STUDENT_BY_ID_QUERY,
+} from "@/queries/graphqlQueires";
+import {  useNotifyAndNavigate } from "@/utils/notify_and_navigate";
 
 const StudentDetailsPage = ({ params }) => {
   const { id } = params;
@@ -57,8 +20,7 @@ const StudentDetailsPage = ({ params }) => {
   const [status, setStatus] = useState("");
   const [feesRecords, setFeesRecords] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  // Fetch student details on mount
+  const notifyAndNavigate = useNotifyAndNavigate();
   useEffect(() => {
     const fetchStudent = async () => {
       try {
@@ -86,17 +48,22 @@ const StudentDetailsPage = ({ params }) => {
         year: parseInt(year),
         status,
       });
-
-      // Update the fees records state
       setFeesRecords([...feesRecords, newRecord.createFeesRecord]);
-
-      // Reset form fields
       setAmount("");
       setMonth("");
       setYear("");
       setStatus("");
     } catch (error) {
       console.error("Error creating fees record:", error);
+    }
+  };
+
+  const handleDeleteStudent = async () => {
+    try {
+      await client.request(DELETE_STUDENT_MUTATION, { id });
+      notifyAndNavigate( "Student deleted successfully!", "/");
+    } catch (error) {
+      console.error("Error deleting student:", error);
     }
   };
 
@@ -132,33 +99,37 @@ const StudentDetailsPage = ({ params }) => {
           <strong>Joining Date:</strong> {student.joiningDate}
         </p>
       </div>
+
+      <Button
+        color="danger"
+        onClick={handleDeleteStudent}
+        startContent={<TrashIcon className="scale-125" />}
+        variant="bordered"
+      >
+        Delete Student
+      </Button>
+
       <h2 className="text-lg font-semibold mb-2">Fees Records</h2>
       {feesRecords.length === 0 ? (
         <p>No fees records found for this student.</p>
       ) : (
-        <table className="min-w-full border-collapse border border-gray-300 mb-4">
-          <thead>
-            <tr>
-              <th className="border border-gray-300 p-2">ID</th>
-              <th className="border border-gray-300 p-2">Amount</th>
-              <th className="border border-gray-300 p-2">Month</th>
-              <th className="border border-gray-300 p-2">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {feesRecords.map((record, index) => (
-              <tr key={record.id}>
-                <td className="border border-gray-300 p-2">{index + 1}</td>
-                <td className="border border-gray-300 p-2">{record.amount}</td>
-                <td className="border border-gray-300 p-2">
-                  {record.month} - {record.year}
-                </td>
-                <td className="border border-gray-300 p-2">{record.status}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div className="grid grid-cols-3 gap-4 mb-4">
+          {feesRecords.map((record) => (
+            <div key={record.id} className="border rounded p-4">
+              <h3 className="font-semibold">
+                {record.month} - {record.year}
+              </h3>
+              <p>
+                <strong>Amount:</strong> {record.amount}
+              </p>
+              <p>
+                <strong>Status:</strong> {record.status}
+              </p>
+            </div>
+          ))}
+        </div>
       )}
+
       <h2 className="text-lg font-semibold mb-2">Add Fees Record</h2>
       <form onSubmit={handleFeesRecordSubmit} className="mb-4">
         <input
@@ -193,9 +164,9 @@ const StudentDetailsPage = ({ params }) => {
           required
           className="border border-gray-300 p-2 mb-2 mr-2"
         />
-        <button type="submit" className="bg-blue-500 text-white p-2">
+        <Button color="success" type="submit">
           Add Fees Record
-        </button>
+        </Button>
       </form>
     </div>
   );
