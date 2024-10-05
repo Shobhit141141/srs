@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Table } from "@radix-ui/themes";
 import { Link1Icon } from "@radix-ui/react-icons";
 import Loader from "@/ui/Loader";
+import { Chip } from "@nextui-org/react";
 
 const GET_ALL_STUDENTS_QUERY = `
   query {
@@ -130,7 +131,9 @@ const StudentsPage = () => {
       </div>
 
       {filteredStudents.length === 0 ? (
-        <p>No students found.</p>
+         <div className="border rounded-lg shadow-sm p-4 mb-4 bg-red-700 font-bold text-center">
+         No Student found
+       </div>
       ) : (
         <Table.Root className="min-w-full border-collapse border border-gray-300">
           <Table.Header>
@@ -138,6 +141,7 @@ const StudentsPage = () => {
               <Table.ColumnHeaderCell>ID</Table.ColumnHeaderCell>
               <Table.ColumnHeaderCell>Name</Table.ColumnHeaderCell>
               <Table.ColumnHeaderCell>Time Slot</Table.ColumnHeaderCell>
+              <Table.ColumnHeaderCell>Status</Table.ColumnHeaderCell>
               <Table.ColumnHeaderCell>Visit</Table.ColumnHeaderCell>
             </Table.Row>
           </Table.Header>
@@ -148,6 +152,9 @@ const StudentsPage = () => {
                 <Table.ColumnHeaderCell>{student.name}</Table.ColumnHeaderCell>
                 <Table.ColumnHeaderCell>
                   {student.timeSlot}
+                </Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>
+                  <Chip color={`${student.isActive ? "success" : "danger"}`} variant="flat">{student.isActive ? "Active" : "Inactive"}</Chip>
                 </Table.ColumnHeaderCell>
                 <Table.ColumnHeaderCell>
                   <Link href={`/student/${student.id}`}>

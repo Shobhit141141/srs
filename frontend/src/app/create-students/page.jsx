@@ -4,7 +4,7 @@ import { useState } from "react";
 import client from "@/utils/graphql";
 import { Button } from "@nextui-org/react";
 import { CREATE_STUDENT_MUTATION } from "@/queries/graphqlQueires";
-import {  useNotifyAndNavigate } from "@/utils/notify_and_navigate";
+import { useNotifyAndNavigate } from "@/utils/notify_and_navigate";
 import { useRouter } from "next/navigation";
 
 const CreateStudentPage = () => {
@@ -12,6 +12,7 @@ const CreateStudentPage = () => {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm();
   const [message, setMessage] = useState("");
   const notifyAndNavigate = useNotifyAndNavigate();
@@ -21,7 +22,7 @@ const CreateStudentPage = () => {
       const response = await client.request(CREATE_STUDENT_MUTATION, {
         input: data,
       });
-      notifyAndNavigate( "Student created successfully", "/");
+      notifyAndNavigate("Student created successfully", "/");
     } catch (error) {
       setMessage(`Error: ${error.message}`);
     }
@@ -56,6 +57,7 @@ const CreateStudentPage = () => {
             className={`border p-2 w-full ${
               errors.joiningDate ? "border-red-500" : "border-gray-300"
             }`}
+            onClick={(e) => e.target.showPicker()} // Show the date picker on input click
           />
           {errors.joiningDate && (
             <p className="text-red-500">Joining Date is required</p>
@@ -87,13 +89,33 @@ const CreateStudentPage = () => {
           <label htmlFor="class" className="block">
             Class:
           </label>
-          <input
+          <select
             id="class"
             {...register("class", { required: true })}
             className={`border p-2 w-full ${
               errors.class ? "border-red-500" : "border-gray-300"
             }`}
-          />
+          >
+            <option value="">Select Class</option>
+            {/* Classes 2nd to 8th */}
+            {Array.from({ length: 7 }, (_, i) => (
+              <option key={i + 2} value={`${i + 2}`}>
+                {`${i + 2}th`}
+              </option>
+            ))}
+
+            {/* Classes 9th to 12th with Hindi and English medium */}
+            {["9th", "10th", "11th", "12th"].map((grade) => (
+              <optgroup key={grade} label={`${grade}`}>
+                <option
+                  value={`${grade} - Hindi`}
+                >{`${grade} - Hindi Medium`}</option>
+                <option value={`${grade} - English`}>
+                  {`${grade} - English Medium`}
+                </option>
+              </optgroup>
+            ))}
+          </select>
           {errors.class && <p className="text-red-500">Class is required</p>}
         </div>
 
@@ -129,12 +151,24 @@ const CreateStudentPage = () => {
           )}
         </div>
 
-        <Button
-          type="submit"
-          className="bg-blue-500 text-white p-2 rounded hover:text-white"
-        >
-          Create Student
-        </Button>
+        <div className="flex justify-between">
+          <Button
+            type="submit"
+            className="bg-blue-500 text-white p-2 rounded hover:text-white"
+          >
+            Create Student
+          </Button>
+
+          {/* Clear Button */}
+          <Button
+            type="button"
+            color="danger"
+            onPress={() => reset()} // Resets form fields
+            className=" p-2 rounded"
+          >
+            Clear
+          </Button>
+        </div>
       </form>
       {message && <p className="mt-4">{message}</p>}
     </div>

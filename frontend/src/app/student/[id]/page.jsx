@@ -12,6 +12,7 @@ import { Badge, Button } from "@radix-ui/themes";
 import { Trash2 } from "lucide-react";
 import Loader from "@/ui/Loader";
 import { Input } from "@nextui-org/react";
+import Link from "next/link";
 
 const StudentDetailsPage = ({ params }) => {
   const { id } = params;
@@ -136,7 +137,11 @@ const StudentDetailsPage = ({ params }) => {
           </div>
           <div className="flex justify-between">
             <strong className="text-yellow-400">Contact Info:</strong>
-            <span className="text-white">{student.contactInfo}</span>
+            <span className="text-blue-400 underline">
+              <Link href={`tel:${student.contactInfo}`}>
+                {student.contactInfo}
+              </Link>
+            </span>
           </div>
           <div className="flex justify-between">
             <strong className="text-yellow-400">Class:</strong>
