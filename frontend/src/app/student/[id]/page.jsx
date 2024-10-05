@@ -8,9 +8,10 @@ import {
   TOGGLE_ACTIVE_STATUS_MUTATION,
 } from "@/queries/graphqlQueires";
 import { useNotifyAndNavigate } from "@/utils/notify_and_navigate";
-import { Badge } from "@radix-ui/themes";
-import { Button } from "@radix-ui/themes";
+import { Badge, Button } from "@radix-ui/themes";
 import { Trash2 } from "lucide-react";
+import Loader from "@/ui/Loader";
+import { Input } from "@nextui-org/react";
 
 const StudentDetailsPage = ({ params }) => {
   const { id } = params;
@@ -22,6 +23,7 @@ const StudentDetailsPage = ({ params }) => {
   const [feesRecords, setFeesRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const notifyAndNavigate = useNotifyAndNavigate();
+
   useEffect(() => {
     const fetchStudent = async () => {
       try {
@@ -42,7 +44,6 @@ const StudentDetailsPage = ({ params }) => {
     e.preventDefault();
 
     try {
-      console.log(student.name);
       const newRecord = await client.request(CREATE_FEES_RECORD_MUTATION, {
         studentId: id,
         studentName: student.name,
@@ -78,7 +79,7 @@ const StudentDetailsPage = ({ params }) => {
       );
       setStudent((prev) => ({
         ...prev,
-        isActive: updatedStudent.toggleStudentActive.isActive, // Update state with the new isActive status
+        isActive: updatedStudent.toggleStudentActive.isActive,
       }));
     } catch (error) {
       console.error("Error updating active status:", error);
@@ -86,8 +87,8 @@ const StudentDetailsPage = ({ params }) => {
   };
 
   const formatDate = (dateString) => {
-    const date = new Date(dateString); // Parse the date string
-    const day = String(date.getDate()).padStart(2, "0"); // Get day and pad with zero if needed
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, "0");
     const monthNames = [
       "Jan",
       "Feb",
@@ -103,13 +104,13 @@ const StudentDetailsPage = ({ params }) => {
       "Dec",
     ];
     const month = monthNames[date.getMonth()];
-    const year = date.getFullYear(); // Get full year
+    const year = date.getFullYear();
 
-    return `${day}-${month}-${year}`; // Format as DD MM YYYY
+    return `${day}-${month}-${year}`;
   };
 
   if (loading) {
-    return <p>Loading...</p>;
+    return <Loader />;
   }
 
   if (!student) {
@@ -117,114 +118,128 @@ const StudentDetailsPage = ({ params }) => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-4 ">
-      <h1 className="text-xl font-bold mb-4">Student Details</h1>
-      <div className="mb-4">
-        <h2 className="text-lg font-semibold">Personal Information</h2>
-        <p>
-          <strong>ID:</strong> {student.id}
-        </p>
-        <p>
-          <strong>Name:</strong> {student.name}
-        </p>
-        <p>
-          <strong>Contact Info:</strong> {student.contactInfo}
-        </p>
-        <p>
-          <strong>Class:</strong> {student.class}
-        </p>
-        <p>
-          <strong>Time Slot:</strong> {student.timeSlot}
-        </p>
-        <p>
-          <strong>Joining Date:</strong> {student.joiningDate}
-        </p>
+    <div className="max-w-4xl mx-auto p-6 shadow-lg rounded-lg mb-16">
+      <h1 className="text-2xl font-bold mb-6 text-center">Student Details</h1>
+
+      <div className="mb-6 bg-[#151515] rounded-lg p-6 shadow-md">
+        <h2 className="text-lg font-semibold mb-4 text-white">
+          Personal Information
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="flex justify-between">
+            <strong className="text-yellow-400">ID:</strong>
+            <span className="text-white">{student.id}</span>
+          </div>
+          <div className="flex justify-between">
+            <strong className="text-yellow-400">Name:</strong>
+            <span className="text-white">{student.name}</span>
+          </div>
+          <div className="flex justify-between">
+            <strong className="text-yellow-400">Contact Info:</strong>
+            <span className="text-white">{student.contactInfo}</span>
+          </div>
+          <div className="flex justify-between">
+            <strong className="text-yellow-400">Class:</strong>
+            <span className="text-white">{student.class}</span>
+          </div>
+          <div className="flex justify-between">
+            <strong className="text-yellow-400">Time Slot:</strong>
+            <span className="text-white">{student.timeSlot}</span>
+          </div>
+          <div className="flex justify-between">
+            <strong className="text-yellow-400">Joining Date:</strong>
+            <span className="text-white">
+              {formatDate(student.joiningDate)}
+            </span>
+          </div>
+        </div>
       </div>
 
-      <Button
-        color="red"
-        onClick={handleDeleteStudent}
-        variant="surface"
-        className="px-2 py-0"
-      >
-        <Trash2 className="scale-[0.9]" /> Delete Student
-      </Button>
+      <div className="flex justify-between items-center mb-6">
+        <Button
+          color="red"
+          onClick={handleDeleteStudent}
+          variant="surface"
+          className="px-4 py-2 flex items-center ml-1"
+        >
+          <Trash2 className=" scale-[0.9]" /> Delete Student
+        </Button>
 
-      <h2 className="text-lg font-semibold mb-2">Toggle Active Status</h2>
+        <div className="flex items-center mr-1">
+          <h2 className="text-lg font-semibold mr-2">Status:</h2>
+          <Badge
+            color={student.isActive ? "green" : "red"}
+            onClick={toggleActiveStatus}
+            className="cursor-pointer px-2 py-1"
+            variant="solid"
+          >
+            {student.isActive ? "Active" : "Inactive"}
+          </Badge>
+        </div>
+      </div>
 
-      <Badge
-        color={`${student.isActive ? "green" : "red"}`}
-        onClick={toggleActiveStatus}
-        className="cursor-pointer px-2 py-1"
-        variant="solid"
-      >
-        {student.isActive ? "Active" : "Inactive"}
-      </Badge>
-
-      <h2 className="text-lg font-semibold mb-2">Fees Records</h2>
+      {/* <h2 className="text-lg font-semibold mb-4">Fees Records</h2> */}
       {feesRecords.length === 0 ? (
-        <p>No fees records found for this student.</p>
+        <div className="border rounded-lg shadow-sm p-4 mb-4 bg-red-500 font-bold text-center">
+          No fees records found for this student.
+        </div>
       ) : (
-        <div className="grid grid-cols-3 gap-4 mb-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-4">
           {feesRecords.map((record) => (
-            <div key={record.id} className="border rounded p-4">
-              <h3 className="font-semibold">
-                {formatDate(record.date_of_payment)}
-              </h3>
-              <p>
-                <strong>Amount:</strong> {record.amount}
-              </p>
-              <p>
-                <strong>Status:</strong> {record.status}
-              </p>
+            <div
+              key={record.id}
+              className="border rounded-lg shadow-sm p-4 bg-[#151515]"
+            >
+              <div className="flex justify-between items-center">
+                <h3 className="font-semibold">
+                  {formatDate(record.date_of_payment)}
+                </h3>
+                <p>
+                  <Badge
+                    color="green"
+                    variant=""
+                    className="px-2 py-2 text-[17px]"
+                  >
+                    ₹{record.amount}
+                  </Badge>
+                </p>
+              </div>
+              <p>{record.status}</p>
             </div>
           ))}
         </div>
       )}
 
       <h2 className="text-lg font-semibold mb-2">Add Fees Record</h2>
-      <form onSubmit={handleFeesRecordSubmit} className="mb-4">
-        <input
+      <form
+        onSubmit={handleFeesRecordSubmit}
+        className="flex flex-col md:flex-row mb-4 gap-4 md:items-center items-start justify-center"
+      >
+        <Input
           type="number"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
           placeholder="Amount"
           required
-          className="border border-gray-300 p-2 mb-2 mr-2"
+          className="p-2 rounded"
+          min="0"
         />
-        {/* <input
-          type="text"
-          value={month}
-          onChange={(e) => setMonth(e.target.value)}
-          placeholder="Month"
-          required
-          className="border border-gray-300 p-2 mb-2 mr-2"
-        />
-        <input
-          type="number"
-          value={year}
-          onChange={(e) => setYear(e.target.value)}
-          placeholder="Year"
-          required
-          className="border border-gray-300 p-2 mb-2 mr-2"
-        /> */}
-        <input
+        <Input
           type="date"
           value={date_of_payment}
           onChange={(e) => setDateOfPayment(e.target.value)}
-          placeholder="Date of Payment"
           required
-          className="border border-gray-300 p-2 mb-2 mr-2"
+          className="p-2 rounded"
         />
-        <input
+        <Input
           type="text"
           value={status}
           onChange={(e) => setStatus(e.target.value)}
-          placeholder="Status"
+          placeholder="Remarks"
           required
-          className="border border-gray-300 p-2 mb-2 mr-2"
+          className="p-2 rounded"
         />
-        <Button color="success" type="submit">
+        <Button color="success" type="submit" className="self-strt ml-3">
           Add Fees Record
         </Button>
       </form>

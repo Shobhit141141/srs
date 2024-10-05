@@ -101,3 +101,7 @@ button {
 select {
   color: white;
 }
+select option {
+  background-color: rgb(17, 17, 17) !important;
+  color: white !important;
+}

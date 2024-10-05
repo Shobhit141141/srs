@@ -15,13 +15,13 @@ export default function RootLayout({ children }) {
   return (
     // <ApolloProvider>
     <html lang="en">
-      <body className={``}>
+      <body className={`dark text-foreground bg-background`}>
         <Toaster position="bottom-right" />
         <CustomNavbar />
 
         {/* <ApolloProvider client={client}> */}
         <Theme appearance="dark">
-          <NextUIProvider >{children}</NextUIProvider>
+          <NextUIProvider>{children}</NextUIProvider>
         </Theme>
         {/* </ApolloProvider> */}
       </body>

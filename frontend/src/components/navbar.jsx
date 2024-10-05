@@ -8,25 +8,21 @@ import {
   NavigationMenuItem,
   NavigationMenuLink,
 } from "@radix-ui/react-navigation-menu"; // Radix UI components
-
+import { ExitIcon } from "@radix-ui/react-icons";
 const CustomNavbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-
-  const toggleMenu = () => {
-    setIsOpen(!isOpen);
-  };
 
   const navLinks = [
     { name: "Home", href: "/", icon: Home },
     { name: "Add Student", href: "/create-students", icon: PlusCircle },
-    { name: "Montly", href: "/monthly", icon: Calendar },
-    { name: "Logout", href: "/logout", icon: LucideLogOut },
+    { name: "Monthly", href: "/monthly", icon: Calendar },
+    { name: "Logout", href: "/logout", icon: ExitIcon },
   ];
 
   return (
     <nav className="text-white px-4">
       {/* Navbar for larger screens */}
-      <div className="mx-auto  justify-between items-center px-2 py-4 hidden md:flex">
+      <div className="mx-auto justify-between items-center px-2 py-4 hidden md:flex">
         <div className="flex items-center space-x-2">
           <NavigationMenu>
             <NavigationMenuList>
@@ -39,13 +35,17 @@ const CustomNavbar = () => {
           </NavigationMenu>
         </div>
 
-        <div className="hidden md:flex space-x-4">
+        <div className="flex space-x-4">
           <NavigationMenu>
-            <NavigationMenuList>
+            <NavigationMenuList className="flex space-x-4">
               {navLinks.map((link) => (
                 <NavigationMenuItem key={link.name}>
-                  <NavigationMenuLink href={link.href} className="hover:text-gray-400">
-                    {link.name}
+                  <NavigationMenuLink 
+                    href={link.href} 
+                    className="flex flex-row items-center space-x-1 hover:bg-yellow-500 p-2 rounded transition-all hover:text-black"
+                  >
+                    <link.icon className="w-4 h-4" />
+                    <span>{link.name}</span>
                   </NavigationMenuLink>
                 </NavigationMenuItem>
               ))}
@@ -100,10 +100,9 @@ const CustomNavbar = () => {
               <NavigationMenuItem key={link.name}>
                 <NavigationMenuLink
                   href={link.href}
-                  className="flex flex-row items-center justify-center space-x-1"
+                  className="flex flex-row items-center justify-center space-x-1 hover:bg-yellow-400 text-yellow-400 p-2 rounded hover:text-black"
                 >
-                  <link.icon className="w-6 h-6 text-yellow-400 hover:text-white " />
-                  {/* <span className="text-sm text-white">{link.name}</span> */}
+                  <link.icon className="w-6 h-6 " />
                 </NavigationMenuLink>
               </NavigationMenuItem>
             ))}
