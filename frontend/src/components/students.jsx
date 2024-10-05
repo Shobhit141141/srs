@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import client from "@/utils/graphql"; // Adjust the path as necessary
 import Link from "next/link";
 import { Spinner } from "@nextui-org/react";
+import { Table } from "@radix-ui/themes";
+import { Link1Icon } from "@radix-ui/react-icons";
 
 const GET_ALL_STUDENTS_QUERY = `
   query {
@@ -24,6 +26,7 @@ const StudentsPage = () => {
 
   const fetchStudents = async () => {
     try {
+      setLoading(true);
       const response = await client.request(GET_ALL_STUDENTS_QUERY);
       setStudents(response.getAllStudents);
     } catch (error) {
@@ -43,12 +46,12 @@ const StudentsPage = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center absolute top-1/2 left-1/2 -translate-x-[50%] -translate-y-[50%]">
-        <Spinner /> {/* You can also add a message here if needed */}
+        <Spinner />
         <p className="ml-2">Loading...</p>
       </div>
     );
   }
-  if (error) return <p className="text-red-500">{error}</p>;
+  // if (error) return <p className="text-red-500">{error}</p>;
 
   return (
     <div className="max-w-4xl mx-auto p-4">
@@ -56,46 +59,45 @@ const StudentsPage = () => {
       {students.length === 0 ? (
         <p>No students found.</p>
       ) : (
-        <table className="min-w-full border-collapse border border-gray-300">
-          <thead>
-            <tr className="text-yellow-400">
-              <th className="border border-gray-300 p-2">ID</th>
-              <th className="border border-gray-300 p-2">Name</th>
-              <th className="border border-gray-300 p-2">Contact Info</th>
-              <th className="border border-gray-300 p-2">Class</th>
-              <th className="border border-gray-300 p-2">Time Slot</th>
-              <th className="border border-gray-300 p-2">Joining Date</th>
-              <th className="border border-gray-300 p-2">Visit</th>
-            </tr>
-          </thead>
-          <tbody>
-            {students.map((student) => (
-             
-                <tr className="text-center cursor-pointer">
-                  <td className="border border-gray-300 p-2">{student.id}</td>
-                  <td className="border border-gray-300 p-2">{student.name}</td>
-                  <td className="border border-gray-300 p-2">
-                    {student.contactInfo}
-                  </td>
-                  <td className="border border-gray-300 p-2">
-                    {student.class}
-                  </td>
-                  <td className="border border-gray-300 p-2">
-                    {student.timeSlot}
-                  </td>
-                  <td className="border border-gray-300 p-2">
-                    {student.joiningDate}
-                  </td>
-                  <td className="border border-gray-300 p-2">
-                    <Link href={`/student/${student.id}`}>
-                      <p className="text-blue-600 underline">Visit</p>
-                    </Link>
-                  </td>
-                </tr>
-     
+        <Table.Root className="min-w-full border-collapse border border-gray-300">
+          <Table.Header>
+            <Table.Row className="text-yellow-400">
+              <Table.ColumnHeaderCell>ID</Table.ColumnHeaderCell>
+              <Table.ColumnHeaderCell>Name</Table.ColumnHeaderCell>
+              {/* <Table.ColumnHeaderCell>Contact Info</Table.ColumnHeaderCell> */}
+              {/* <Table.ColumnHeaderCell >Class</Table.ColumnHeaderCell> */}
+              <Table.ColumnHeaderCell>Time Slot</Table.ColumnHeaderCell>
+              {/* <Table.ColumnHeaderCell>Joining Date</Table.ColumnHeaderCell> */}
+              <Table.ColumnHeaderCell>Visit</Table.ColumnHeaderCell>
+            </Table.Row>
+          </Table.Header>
+          <Table.Body>
+            {students.map((student, index) => (
+              <Table.Row className="cursor-pointer">
+                <Table.ColumnHeaderCell>{index + 1}</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>{student.name}</Table.ColumnHeaderCell>
+                {/* <Table.ColumnHeaderCell>
+                  {student.contactInfo}
+                </Table.ColumnHeaderCell> */}
+                {/* <Table.ColumnHeaderCell>{student.class}</Table.ColumnHeaderCell> */}
+                <Table.ColumnHeaderCell>
+                  {student.timeSlot}
+                </Table.ColumnHeaderCell>
+                {/* <Table.ColumnHeaderCell>
+                  {student.joiningDate}
+                </Table.ColumnHeaderCell> */}
+                <Table.ColumnHeaderCell>
+                  <Link href={`/student/${student.id}`}>
+                    <p className="text-blue-500 underline flex items-center gap-2">
+                      {" "}
+                      <Link1Icon />{" "}
+                    </p>
+                  </Link>
+                </Table.ColumnHeaderCell>
+              </Table.Row>
             ))}
-          </tbody>
-        </table>
+          </Table.Body>
+        </Table.Root>
       )}
     </div>
   );

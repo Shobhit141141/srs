@@ -46,6 +46,11 @@ const Student = sequelize.define(
         '7 - 8 PM'
       ),
       allowNull: false
+    },
+    isActive: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true // Default to active
     }
   },
   {}

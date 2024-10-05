@@ -13,15 +13,25 @@ const sequelize = new Sequelize(
     dialectOptions: {
       ssl: {
         require: false,
-        rejectUnauthorized: false,
-      },
-    },
+        rejectUnauthorized: false
+      }
+    }
   }
 );
 
 sequelize
-  .authenticate()
-  .then(() => console.log('Connected to Aiven PostgreSQL'))
-  .catch(err => console.log('Error connecting to Aiven PostgreSQL:', err));
+  .authenticate()  // Check if the connection is successful
+  .then(() => {
+    console.log('Connected to Aiven PostgreSQL');
+    
+    // Once the connection is authenticated, sync the models
+    return sequelize.sync();  // Sync the database (create tables if they don't exist)
+  })
+  .then(() => {
+    console.log('Database synchronized successfully.');
+  })
+  .catch(err => {
+    console.log('Error connecting to Aiven PostgreSQL or synchronizing the database:', err);
+  });
 
 module.exports = sequelize;

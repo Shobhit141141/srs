@@ -1,6 +1,7 @@
 const { gql } = require('apollo-server-express');
 
 const typeDefs = gql`
+  scalar Date
   type Student {
     id: ID!
     name: String!
@@ -9,15 +10,15 @@ const typeDefs = gql`
     class: String!
     timeSlot: String!
     feesRecords: [FeesRecord!]!
+    isActive: Boolean!
   }
 
   type FeesRecord {
     id: ID!
     studentId: ID!
     amount: Float!
-    month: String!
-    year: Int!
-    status: String! # Paid/Unpaid
+    date_of_payment: Date! 
+    status: String! 
   }
 
   type Query {
@@ -48,11 +49,11 @@ const typeDefs = gql`
     createFeesRecord(
       studentId: ID!
       amount: Float!
-      month: String!
-      year: Int!
+      date_of_payment: Date!
       status: String!
     ): FeesRecord
     updateFeesRecord(id: ID!, amount: Float, status: String): FeesRecord
+    toggleStudentActive(id: ID!): Student
   }
 `;
 

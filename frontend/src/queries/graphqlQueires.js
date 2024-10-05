@@ -4,21 +4,18 @@ export const CREATE_FEES_RECORD_MUTATION = gql`
   mutation CreateFeesRecord(
     $studentId: ID!
     $amount: Float!
-    $month: String!
-    $year: Int!
+    $date_of_payment: Date!
     $status: String!
   ) {
     createFeesRecord(
       studentId: $studentId
       amount: $amount
-      month: $month
-      year: $year
+      date_of_payment: $date_of_payment
       status: $status
     ) {
       id
       amount
-      month
-      year
+      date_of_payment
       status
     }
   }
@@ -33,11 +30,11 @@ export const GET_STUDENT_BY_ID_QUERY = gql`
       class
       timeSlot
       joiningDate
+      isActive
       feesRecords {
         id
         amount
-        month
-        year
+        date_of_payment
         status
       }
     }
@@ -53,6 +50,7 @@ export const GET_ALL_STUDENTS_QUERY = `
       class
       timeSlot
       joiningDate
+      isActive
     }
   }
 `;
@@ -81,5 +79,14 @@ export const CREATE_STUDENT_MUTATION = gql`
 export const DELETE_STUDENT_MUTATION = gql`
   mutation DeleteStudent($id: ID!) {
     deleteStudent(id: $id)
+  }
+`;
+
+export const TOGGLE_ACTIVE_STATUS_MUTATION = gql`
+  mutation ToggleStudentActive($id: ID!) {
+    toggleStudentActive(id: $id) {
+      id
+      isActive
+    }
   }
 `;

@@ -1,7 +1,10 @@
+
 import CustomNavbar from "@/components/navbar";
 import "./globals.css";
 import { NextUIProvider } from "@nextui-org/react";
 import { Toaster } from "react-hot-toast";
+import { Theme } from "@radix-ui/themes";
+import "@radix-ui/themes/styles.css";
 
 export const metadata = {
   title: "Create Next App",
@@ -13,11 +16,13 @@ export default function RootLayout({ children }) {
     // <ApolloProvider>
     <html lang="en">
       <body className={``}>
-        <Toaster position="bottom-right"/>
+        <Toaster position="bottom-right" />
         <CustomNavbar />
 
         {/* <ApolloProvider client={client}> */}
-        <NextUIProvider>{children}</NextUIProvider>
+        <Theme appearance="dark">
+          <NextUIProvider >{children}</NextUIProvider>
+        </Theme>
         {/* </ApolloProvider> */}
       </body>
     </html>

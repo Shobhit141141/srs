@@ -17,12 +17,8 @@ const FeesRecord = sequelize.define(
       type: DataTypes.FLOAT,
       allowNull: false,
     },
-    month: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    year: {
-      type: DataTypes.INTEGER,
+    date_of_payment: {
+      type: DataTypes.DATE,
       allowNull: false,
     },
     status: {

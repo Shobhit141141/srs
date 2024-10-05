@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -68,12 +69,20 @@
 
 html,
 body {
-  background-color: rgb(17, 17, 17);
+  background-color: rgb(17, 17, 17) !important;
   color: white;
   margin: 0;
   padding: 0;
   min-height: 100vh;
   height: max-content;
+
+  /* Hide scrollbar but don't change overflow */
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 
 #__next {
@@ -85,14 +94,10 @@ button {
   border-radius: 6px !important;
 }
 
-input {
-  color: black;
-}
-
 .max-z {
   z-index: 9999;
 }
-select{
-  color: black;
-  
+
+select {
+  color: white;
 }

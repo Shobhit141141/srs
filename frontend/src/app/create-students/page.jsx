@@ -104,7 +104,7 @@ const CreateStudentPage = () => {
           <select
             id="timeSlot"
             {...register("timeSlot", { required: true })}
-            className={`border p-2 w-full text-black ${
+            className={`border p-2 w-full${
               errors.timeSlot ? "border-red-500" : "border-gray-300"
             }`}
           >
