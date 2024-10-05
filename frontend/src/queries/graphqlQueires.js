@@ -3,18 +3,21 @@ import { gql } from "graphql-request";
 export const CREATE_FEES_RECORD_MUTATION = gql`
   mutation CreateFeesRecord(
     $studentId: ID!
+    $studentName: String!
     $amount: Float!
     $date_of_payment: Date!
     $status: String!
   ) {
     createFeesRecord(
       studentId: $studentId
+      studentName: $studentName
       amount: $amount
       date_of_payment: $date_of_payment
       status: $status
     ) {
       id
       amount
+      studentName
       date_of_payment
       status
     }
@@ -87,6 +90,28 @@ export const TOGGLE_ACTIVE_STATUS_MUTATION = gql`
     toggleStudentActive(id: $id) {
       id
       isActive
+    }
+  }
+`;
+
+export const GET_MONTHLY_FEES_REPORT = gql`
+  query GetMonthlyFeesReport($year: Int!, $month: Int!) {
+    getMonthlyFeesReport(year: $year, month: $month) {
+      paidFeesCount
+      unpaidFeesCount
+      paidStudents {
+        studentId
+        studentName
+        amount
+        date_of_payment
+        status
+      }
+      unpaidStudents {
+        id
+        name
+        contactInfo
+        class
+      }
     }
   }
 `;

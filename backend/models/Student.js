@@ -56,5 +56,14 @@ const Student = sequelize.define(
   {}
 );
 
+// sequelize
+//   .sync({ alter: true })
+//   .then(() => {
+//     console.log('Students table synced with database.');
+//   })
+//   .catch(error => {
+//     console.error('Error syncing Students table:', error);
+//   });
+
 // Student.hasMany(FeesRecord, { foreignKey: 'studentId' });
 module.exports = Student;

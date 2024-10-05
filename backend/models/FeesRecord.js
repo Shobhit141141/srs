@@ -13,6 +13,10 @@ const FeesRecord = sequelize.define(
         key: 'id',
       },
     },
+    studentName:{
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     amount: {
       type: DataTypes.FLOAT,
       allowNull: false,
@@ -30,5 +34,14 @@ const FeesRecord = sequelize.define(
 );
 
 FeesRecord.belongsTo(Student, { foreignKey: 'studentId' });
+
+sequelize.sync({ alter: true })
+  .then(() => {
+    console.log('FeesRecord table synced with database.');
+  })
+  .catch((error) => {
+    console.error('Error syncing FeesRecord table:', error);
+  });
+
 
 module.exports = FeesRecord;

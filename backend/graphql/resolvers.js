@@ -1,6 +1,6 @@
 const FeesRecord = require('../models/FeesRecord');
 const Student = require('../models/Student');
-
+const { Op } = require('sequelize');
 const resolvers = {
   Query: {
     async getStudentById(_, { id }) {
@@ -29,6 +29,41 @@ const resolvers = {
       });
 
       return students;
+    },
+
+    async getMonthlyFeesReport(_, { year, month }) {
+      // Calculate the start and end of the month
+      const startDate = new Date(year, month - 1, 1); // First day of the month
+      const endDate = new Date(year, month, 0); // Last day of the month
+
+      // Fetch all fees records for the specified month
+      const feesRecords = await FeesRecord.findAll({
+        where: {
+          date_of_payment: {
+            [Op.between]: [startDate, endDate]
+          }
+        }
+      });
+
+      // Get the student IDs who have paid fees
+      const paidStudentIds = feesRecords.map(record => record.studentId);
+
+      // Fetch students who haven't paid fees in the given month
+      const unpaidStudents = await Student.findAll({
+        where: {
+          id: {
+            [Op.notIn]: paidStudentIds
+          }
+        }
+      });
+
+      // Return the report
+      return {
+        paidFeesCount: paidStudentIds.length,
+        unpaidFeesCount: unpaidStudents.length,
+        paidStudents: feesRecords,
+        unpaidStudents
+      };
     }
   },
   Mutation: {
@@ -101,9 +136,14 @@ const resolvers = {
       return `Student with id ${id} deleted successfully`;
     },
 
-    async createFeesRecord(_, { studentId, amount, date_of_payment, status }) {
+    async createFeesRecord(
+      _,
+      { studentId, studentName, amount, date_of_payment, status }
+    ) {
+      console.log(studentName);
       return await FeesRecord.create({
         studentId,
+        studentName,
         amount,
         date_of_payment,
         status

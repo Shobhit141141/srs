@@ -1,8 +1,6 @@
 "use client";
 import client from "@/utils/graphql";
 import { useEffect, useState } from "react";
-import { Switch, toggle } from "@nextui-org/react";
-import { TrashIcon } from "@radix-ui/react-icons";
 import {
   CREATE_FEES_RECORD_MUTATION,
   DELETE_STUDENT_MUTATION,
@@ -12,7 +10,8 @@ import {
 import { useNotifyAndNavigate } from "@/utils/notify_and_navigate";
 import { Badge } from "@radix-ui/themes";
 import { Button } from "@radix-ui/themes";
-import { Delete, DeleteIcon, LucideDelete, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
+
 const StudentDetailsPage = ({ params }) => {
   const { id } = params;
 
@@ -43,8 +42,10 @@ const StudentDetailsPage = ({ params }) => {
     e.preventDefault();
 
     try {
+      console.log(student.name);
       const newRecord = await client.request(CREATE_FEES_RECORD_MUTATION, {
         studentId: id,
+        studentName: student.name,
         amount: parseFloat(amount),
         date_of_payment,
         status,
@@ -86,14 +87,26 @@ const StudentDetailsPage = ({ params }) => {
 
   const formatDate = (dateString) => {
     const date = new Date(dateString); // Parse the date string
-    const day = String(date.getDate()).padStart(2, '0'); // Get day and pad with zero if needed
-    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  const month = monthNames[date.getMonth()]; 
+    const day = String(date.getDate()).padStart(2, "0"); // Get day and pad with zero if needed
+    const monthNames = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    const month = monthNames[date.getMonth()];
     const year = date.getFullYear(); // Get full year
-  
+
     return `${day}-${month}-${year}`; // Format as DD MM YYYY
   };
-  
 
   if (loading) {
     return <p>Loading...</p>;
@@ -155,7 +168,9 @@ const StudentDetailsPage = ({ params }) => {
         <div className="grid grid-cols-3 gap-4 mb-4">
           {feesRecords.map((record) => (
             <div key={record.id} className="border rounded p-4">
-             <h3 className="font-semibold">{formatDate(record.date_of_payment)}</h3>
+              <h3 className="font-semibold">
+                {formatDate(record.date_of_payment)}
+              </h3>
               <p>
                 <strong>Amount:</strong> {record.amount}
               </p>

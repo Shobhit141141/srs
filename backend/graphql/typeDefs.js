@@ -16,9 +16,17 @@ const typeDefs = gql`
   type FeesRecord {
     id: ID!
     studentId: ID!
+    studentName: String!
     amount: Float!
-    date_of_payment: Date! 
-    status: String! 
+    date_of_payment: Date!
+    status: String!
+  }
+
+  type MonthlyFeesReport {
+    paidFeesCount: Int!
+    unpaidFeesCount: Int!
+    paidStudents: [FeesRecord!]!
+    unpaidStudents: [Student!]!
   }
 
   type Query {
@@ -26,6 +34,7 @@ const typeDefs = gql`
     getAllStudents: [Student!]
     getFeesRecords(studentId: ID!): [FeesRecord!]
     studentsByTimeSlot(timeSlot: String!): [Student!]!
+    getMonthlyFeesReport(year: Int!, month: Int!): MonthlyFeesReport!
   }
 
   input CreateStudentInput {
@@ -48,6 +57,7 @@ const typeDefs = gql`
     deleteStudent(id: ID!): String
     createFeesRecord(
       studentId: ID!
+      studentName: String!
       amount: Float!
       date_of_payment: Date!
       status: String!
