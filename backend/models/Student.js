@@ -29,6 +29,10 @@ const Student = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false
     },
+    feesAmount: {
+      type: DataTypes.FLOAT,
+      allowNull:true 
+    },
     timeSlot: {
       type: DataTypes.ENUM(
         '7 - 8 AM',
@@ -46,6 +50,10 @@ const Student = sequelize.define(
         '7 - 8 PM'
       ),
       allowNull: false
+    },
+    notes: {
+      type: DataTypes.TEXT,
+      allowNull: true
     },
     isActive: {
       type: DataTypes.BOOLEAN,

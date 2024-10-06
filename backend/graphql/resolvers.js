@@ -73,10 +73,12 @@ const resolvers = {
         joiningDate,
         contactInfo,
         class: className,
+        feesAmount,
+        notes,
         timeSlot
       } = input;
 
-      if (!name || !joiningDate || !contactInfo || !className || !timeSlot) {
+      if (!name || !joiningDate || !contactInfo || !className || !timeSlot || !feesAmount || !notes) {
         throw new Error(
           'All fields are required: name, joiningDate, contactInfo, class, timeSlot.'
         );
@@ -92,13 +94,15 @@ const resolvers = {
         joiningDate,
         contactInfo,
         class: className,
+        feesAmount,
+        notes,
         timeSlot
       });
     },
 
     async updateStudent(
       _,
-      { id, name, contactInfo, class: className, timeSlot }
+      { id, name, contactInfo, class: className,feesAmount,notes, timeSlot }
     ) {
       const student = await Student.findByPk(id);
       if (!student) throw new Error('Student not found');
@@ -107,6 +111,8 @@ const resolvers = {
         name: name || student.name,
         contactInfo: contactInfo || student.contactInfo,
         class: className || student.class,
+        feesAmount: feesAmount || student.feesAmount,
+        notes : notes || student.notes,
         timeSlot: timeSlot || student.timeSlot
       });
 

@@ -2,10 +2,12 @@
 import { useState } from "react";
 import { request } from "graphql-request";
 import { GET_MONTHLY_FEES_REPORT } from "@/queries/graphqlQueires";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@radix-ui/react-tabs";
-import { Badge, Button } from "@radix-ui/themes";
-import { Chip } from "@nextui-org/react";
+import { Tabs, TabsList, TabsTrigger } from "@radix-ui/react-tabs";
+import { Button } from "@radix-ui/themes";
+import { Table } from "@radix-ui/themes";
+import {  Chip, Input } from "@nextui-org/react";
 import Link from "next/link";
+import { SearchIcon } from "lucide-react";
 
 const endpoint = "http://localhost:4000/graphql"; // Your GraphQL server endpoint
 
@@ -15,6 +17,7 @@ const FeesReportPage = () => {
   const [reportData, setReportData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState("all"); // New state for filter
+  const [searchQuery, setSearchQuery] = useState(""); // New state for search
 
   const months = [
     { value: 1, label: "January" },
@@ -48,15 +51,37 @@ const FeesReportPage = () => {
 
   // Filter students based on the selected filter
   const getFilteredStudents = () => {
-    if (!reportData) return [];
-    switch (filter) {
-      case "paid":
-        return reportData.paidStudents;
-      case "unpaid":
-        return reportData.unpaidStudents;
-      default:
-        return [...reportData.paidStudents, ...reportData.unpaidStudents];
+    if (
+      !reportData ||
+      !Array.isArray(reportData.paidStudents) ||
+      !Array.isArray(reportData.unpaidStudents)
+    ) {
+      return [];
     }
+    let filteredStudents =
+      filter === "paid"
+        ? reportData.paidStudents
+        : filter === "unpaid"
+        ? reportData.unpaidStudents
+        : [...reportData.paidStudents, ...reportData.unpaidStudents];
+
+    if (searchQuery) {
+      console.log(filteredStudents);
+      filteredStudents = filteredStudents.filter((student) => {
+        const studentName = student?.studentName || student?.name; // Check for both 'studentName' and 'name'
+        return studentName?.toLowerCase().includes(searchQuery.toLowerCase());
+      });
+    }
+
+    return filteredStudents;
+  };
+
+  const getTotalFeesCollected = () => {
+    if (!reportData) return 0;
+    return reportData.paidStudents.reduce(
+      (total, student) => total + (student.amount || 0),
+      0
+    );
   };
 
   return (
@@ -111,7 +136,7 @@ const FeesReportPage = () => {
       <Tabs
         defaultValue="all"
         value={filter}
-        onValueChange={setFilter}
+        onValueChange={(value) => setFilter(value)}
         className="mb-4"
       >
         <TabsList className="flex space-x-4">
@@ -148,6 +173,26 @@ const FeesReportPage = () => {
         </TabsList>
       </Tabs>
 
+      <Input
+        isClearable
+        radius="lg"
+        classNames={{
+          label: "text-black/50 dark:text-white/90",
+          input: [
+            "bg-transparent",
+            "text-black/90 dark:text-white/90",
+            "placeholder:text-default-700/50 dark:placeholder:text-white/60",
+            "my-4",
+          ],
+        }}
+        placeholder="Type to search..."
+        startContent={<SearchIcon className="scale-[0.8]" />}
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        clearable
+        onClear={() => setSearchQuery("")} // Handle clearing the search query
+      />
+
       {/* Display the Results */}
       {reportData && (
         <div>
@@ -177,45 +222,61 @@ const FeesReportPage = () => {
                   {reportData.unpaidFeesCount}
                 </p>
               </div>
+
+              <div className="bg-blue-100 p-4 rounded-lg shadow-md mb-4">
+                <h3 className="text-lg font-semibold text-blue-800">
+                  Fees Collected
+                </h3>
+                <p className="text-2xl font-bold text-blue-600">
+                  ₹{getTotalFeesCollected()}
+                </p>
+              </div>
             </div>
           </div>
 
           {/* Display the filtered students */}
-          <table className="min-w-full border-collapse border border-SelectItem-300 mt-4">
-            <thead>
-              <tr className="bg-SelectItem-100">
-                <th className="border border-SelectItem-300 px-4 py-2">Name</th>
-                <th className="border border-SelectItem-300 px-4 py-2">
-                  Amount
-                </th>
-                <th className="border border-SelectItem-300 px-4 py-2">
-                  Date of Payment
-                </th>
-                <th className="border border-SelectItem-300 px-4 py-2">
-                  Status
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {getFilteredStudents().map((student) => (
-                <tr
-                  key={student.studentId || student.id}
+          <Table.Root className="min-w-full border-collapse border border-SelectItem-300 mt-4" variant="surface">
+            <Table.Header>
+              <Table.Row className="bg-SelectItem-100 text-yellow-400">
+                <Table.ColumnHeaderCell>Name</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Amount</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Date of Payment</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell>Status</Table.ColumnHeaderCell>
+              </Table.Row>
+            </Table.Header>
+            <Table.Body>
+              {getFilteredStudents().map((student, index) => (
+                <Table.Row
+                  key={index}
                   className="border border-SelectItem-300 even:bg-SelectItem-50"
                 >
-                  <td className="border border-SelectItem-300 px-4 py-2 hover:text-blue-500 hover:underline transition-all">
-                  <Link href={`/student/${student.studentId || student.id}`}>
-                    {student.studentName || student.name}
-                  </Link>
-                  </td>
-                  <td className="border border-SelectItem-300 px-4 py-2">
-                    ₹{student.amount ? student.amount : " - "}
-                  </td>
-                  <td className="border border-SelectItem-300 px-4 py-2">
+                  <Table.ColumnHeaderCell className="border border-SelectItem-300 px-4 py-2 hover:text-blue-500 hover:underline transition-all">
+                    <Link href={`/student/${student.studentId || student.id}`}>
+                      {student.studentName || student.name}
+                    </Link>
+                  </Table.ColumnHeaderCell>
+
+                  <Table.ColumnHeaderCell>
+                    {student.amount
+                      ? new Intl.NumberFormat("en-IN", {
+                          style: "currency",
+                          currency: "INR",
+                        }).format(student.amount)
+                      : " - "}
+                  </Table.ColumnHeaderCell>
+
+                  <Table.ColumnHeaderCell>
                     {student.date_of_payment
-                      ? new Date(student.date_of_payment).toLocaleDateString()
+                      ? new Date(student.date_of_payment).toLocaleDateString(
+                          undefined,
+                          { year: "numeric", month: "long", day: "numeric" }
+                        )
                       : " -/--/---- "}
-                  </td>
-                  <td className={`border border-SelectItem-300 px-4 py-2`}>
+                  </Table.ColumnHeaderCell>
+
+                  <Table.ColumnHeaderCell
+                    className={`border border-SelectItem-300 px-4 py-2`}
+                  >
                     <Chip
                       className="mx-auto"
                       variant="flat"
@@ -223,11 +284,11 @@ const FeesReportPage = () => {
                     >
                       {student.amount ? "Paid" : "Unpaid"}
                     </Chip>
-                  </td>
-                </tr>
+                  </Table.ColumnHeaderCell>
+                </Table.Row>
               ))}
-            </tbody>
-          </table>
+            </Table.Body>
+          </Table.Root>
         </div>
       )}
     </div>

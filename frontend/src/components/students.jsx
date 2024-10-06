@@ -3,9 +3,9 @@ import { useEffect, useState } from "react";
 import client from "@/utils/graphql"; // Adjust the path as necessary
 import Link from "next/link";
 import { Table } from "@radix-ui/themes";
-import { Link1Icon } from "@radix-ui/react-icons";
 import Loader from "@/ui/Loader";
-import { Chip } from "@nextui-org/react";
+import { Chip, Input } from "@nextui-org/react";
+import { SearchIcon } from "lucide-react";
 
 const GET_ALL_STUDENTS_QUERY = `
   query {
@@ -28,6 +28,8 @@ const StudentsPage = () => {
   const [error, setError] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [timeSlotFilter, setTimeSlotFilter] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+
 
   const fetchStudents = async () => {
     try {
@@ -51,26 +53,34 @@ const StudentsPage = () => {
 
   useEffect(() => {
     let updatedStudents = students;
-
+  
     // Apply status filter
     if (statusFilter === "active") {
       updatedStudents = updatedStudents.filter((student) => student.isActive);
     } else if (statusFilter === "inactive") {
       updatedStudents = updatedStudents.filter((student) => !student.isActive);
     }
-
+  
     // Apply time slot filter
     if (timeSlotFilter) {
       updatedStudents = updatedStudents.filter(
         (student) => student.timeSlot === timeSlotFilter
       );
     }
-
+  
+    // Apply search query filter
+    if (searchQuery) {
+      updatedStudents = updatedStudents.filter((student) =>
+        student.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+  
     // Sort by time slot
     updatedStudents.sort((a, b) => (a.timeSlot > b.timeSlot ? 1 : -1));
-
+  
     setFilteredStudents(updatedStudents);
-  }, [statusFilter, timeSlotFilter, students]);
+  }, [statusFilter, timeSlotFilter, searchQuery, students]);
+  
 
   if (loading) {
     return <Loader />;
@@ -130,39 +140,67 @@ const StudentsPage = () => {
         </select>
       </div>
 
+      <Input
+        isClearable
+        radius="lg"
+        classNames={{
+          label: "text-black/50 dark:text-white/90",
+          input: [
+            "bg-transparent",
+            "text-black/90 dark:text-white/90",
+            "placeholder:text-default-700/50 dark:placeholder:text-white/60",
+            "my-4",
+          ],
+        }}
+        placeholder="Type to search..."
+        startContent={<SearchIcon className="scale-[0.8]" />}
+        value={searchQuery} // Bind the search query state
+        onChange={(e) => setSearchQuery(e.target.value)} 
+      />
+
       {filteredStudents.length === 0 ? (
-         <div className="border rounded-lg shadow-sm p-4 mb-4 bg-red-700 font-bold text-center">
-         No Student found
-       </div>
+        <div className="border rounded-lg shadow-sm p-4 my-4 bg-red-700 font-bold text-center">
+          No Student found
+        </div>
       ) : (
-        <Table.Root className="min-w-full border-collapse border border-gray-300">
+        <Table.Root className="min-w-full border-collapse border border-gray-500 rounded-md mt-4" variant="surface">
           <Table.Header>
             <Table.Row className="text-yellow-400">
               <Table.ColumnHeaderCell>ID</Table.ColumnHeaderCell>
               <Table.ColumnHeaderCell>Name</Table.ColumnHeaderCell>
               <Table.ColumnHeaderCell>Time Slot</Table.ColumnHeaderCell>
               <Table.ColumnHeaderCell>Status</Table.ColumnHeaderCell>
-              <Table.ColumnHeaderCell>Visit</Table.ColumnHeaderCell>
+              {/* <Table.ColumnHeaderCell>Visit</Table.ColumnHeaderCell> */}
             </Table.Row>
           </Table.Header>
           <Table.Body>
             {filteredStudents.map((student, index) => (
               <Table.Row key={student.id} className="cursor-pointer">
                 <Table.ColumnHeaderCell>{index + 1}</Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell>{student.name}</Table.ColumnHeaderCell>
+                <Table.ColumnHeaderCell className="hover:text-blue-400 hover:underline">
+
+                  <Link href={`/student/${student.id}`}>
+                  {student.name}
+                  </Link>
+                </Table.ColumnHeaderCell>
                 <Table.ColumnHeaderCell>
                   {student.timeSlot}
                 </Table.ColumnHeaderCell>
                 <Table.ColumnHeaderCell>
-                  <Chip color={`${student.isActive ? "success" : "danger"}`} variant="flat">{student.isActive ? "Active" : "Inactive"}</Chip>
+                  <Chip
+                    color={`${student.isActive ? "success" : "danger"}`}
+                    variant="flat"
+                  >
+                    {student.isActive ? "Active" : "Inactive"}
+                  </Chip>
                 </Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell>
+                {/* <Table.ColumnHeaderCell>
                   <Link href={`/student/${student.id}`}>
                     <p className="text-blue-500 underline flex items-center gap-2">
                       <Link1Icon /> Visit
                     </p>
                   </Link>
-                </Table.ColumnHeaderCell>
+                </Table.ColumnHeaderCell> */}
               </Table.Row>
             ))}
           </Table.Body>

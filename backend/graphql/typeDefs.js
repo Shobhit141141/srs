@@ -8,6 +8,8 @@ const typeDefs = gql`
     joiningDate: String!
     contactInfo: String!
     class: String!
+    feesAmount: Float! 
+    notes: String
     timeSlot: String!
     feesRecords: [FeesRecord!]!
     isActive: Boolean!
@@ -42,6 +44,8 @@ const typeDefs = gql`
     joiningDate: String!
     contactInfo: String!
     class: String!
+    feesAmount: Float!
+    notes: String
     timeSlot: String!
   }
 
@@ -52,6 +56,8 @@ const typeDefs = gql`
       name: String
       contactInfo: String
       class: String
+      feesAmount: Float
+      notes: String
       timeSlot: String
     ): Student
     deleteStudent(id: ID!): String

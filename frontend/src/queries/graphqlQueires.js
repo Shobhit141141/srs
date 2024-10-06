@@ -23,6 +23,20 @@ export const CREATE_FEES_RECORD_MUTATION = gql`
     }
   }
 `;
+export const UPDATE_STUDENT_MUTATION = gql`
+  mutation UpdateStudent($id: ID!, $input: UpdateStudentInput!) {
+    updateStudent(id: $id, input: $input) {
+      id
+      name
+      contactInfo
+      class
+      feesAmount
+      notes
+      timeSlot
+      isActive
+    }
+  }
+`;
 
 export const GET_STUDENT_BY_ID_QUERY = gql`
   query GetStudentById($id: ID!) {
@@ -31,6 +45,8 @@ export const GET_STUDENT_BY_ID_QUERY = gql`
       name
       contactInfo
       class
+      feesAmount
+      notes
       timeSlot
       joiningDate
       isActive
@@ -49,10 +65,8 @@ export const GET_ALL_STUDENTS_QUERY = `
     getAllStudents {
       id
       name
-      contactInfo
       class
       timeSlot
-      joiningDate
       isActive
     }
   }
@@ -65,6 +79,8 @@ export const CREATE_STUDENT_MUTATION = gql`
       name
       contactInfo
       class
+      feesAmount
+      notes
       timeSlot
     }
   }

@@ -11,7 +11,7 @@ import { useNotifyAndNavigate } from "@/utils/notify_and_navigate";
 import { Badge, Button } from "@radix-ui/themes";
 import { Trash2 } from "lucide-react";
 import Loader from "@/ui/Loader";
-import { Input } from "@nextui-org/react";
+import { Chip, Input } from "@nextui-org/react";
 import Link from "next/link";
 
 const StudentDetailsPage = ({ params }) => {
@@ -128,10 +128,6 @@ const StudentDetailsPage = ({ params }) => {
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="flex justify-between">
-            <strong className="text-yellow-400">ID:</strong>
-            <span className="text-white">{student.id}</span>
-          </div>
-          <div className="flex justify-between">
             <strong className="text-yellow-400">Name:</strong>
             <span className="text-white">{student.name}</span>
           </div>
@@ -142,6 +138,12 @@ const StudentDetailsPage = ({ params }) => {
                 {student.contactInfo}
               </Link>
             </span>
+          </div>
+          <div className="flex justify-between">
+            <strong className="text-yellow-400">Fees:</strong>
+            <Chip color="warning" variant="flat" className="text-white">
+              ₹ {student.feesAmount}
+            </Chip>
           </div>
           <div className="flex justify-between">
             <strong className="text-yellow-400">Class:</strong>
@@ -209,7 +211,7 @@ const StudentDetailsPage = ({ params }) => {
                   </Badge>
                 </p>
               </div>
-              <p>{record.status}</p>
+              <p className="text-[14px]">{record.status}</p>
             </div>
           ))}
         </div>
@@ -248,6 +250,11 @@ const StudentDetailsPage = ({ params }) => {
           Add Fees Record
         </Button>
       </form>
+
+      <div className="bg-[#2a2a2a] p-4 rounded-md">
+        <h2 className="text-lg font-semibold mb-2 text-yellow-500">Notes</h2>
+        <p className="text-white ">{student.notes || "No notes available."}</p>
+      </div>
     </div>
   );
 };

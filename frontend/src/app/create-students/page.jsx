@@ -19,8 +19,13 @@ const CreateStudentPage = () => {
 
   const onSubmit = async (data) => {
     try {
+      const formattedData = {
+        ...data,
+        feesAmount: parseFloat(data.feesAmount),
+      };
+
       const response = await client.request(CREATE_STUDENT_MUTATION, {
-        input: data,
+        input: formattedData,
       });
       notifyAndNavigate("Student created successfully", "/");
     } catch (error) {
@@ -29,7 +34,7 @@ const CreateStudentPage = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto p-4 ">
+    <div className="max-w-md mx-auto p-4 mb-[100px]">
       <h1 className="text-[44px] font-light mb-4">Create Student</h1>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
@@ -120,13 +125,33 @@ const CreateStudentPage = () => {
         </div>
 
         <div>
+          <label htmlFor="feesAmount" className="block">
+            Fees Amount:
+          </label>
+          <input
+            type="number"
+            id="feesAmount"
+            min="0"
+            {...register("feesAmount", { required: true, min: 0 })} // Include min validation here
+            className={`border p-2 w-full ${
+              errors.feesAmount ? "border-red-500" : "border-gray-300"
+            }`}
+          />
+          {errors.feesAmount && (
+            <p className="text-red-500">
+              Fees Amount is required and must be a non-negative number
+            </p>
+          )}
+    
+        </div>
+        <div>
           <label htmlFor="timeSlot" className="block">
             Time Slot:
           </label>
           <select
             id="timeSlot"
             {...register("timeSlot", { required: true })}
-            className={`border p-2 w-full${
+            className={`border p-2 w-full ${
               errors.timeSlot ? "border-red-500" : "border-gray-300"
             }`}
           >
@@ -149,6 +174,20 @@ const CreateStudentPage = () => {
           {errors.timeSlot && (
             <p className="text-red-500">Time Slot is required</p>
           )}
+        </div>
+
+        <div>
+          <label htmlFor="notes" className="block">
+            Notes:
+          </label>
+          <textarea
+  id="notes"
+  {...register("notes", { required: true })} // Add required validation
+  className={`border p-2 w-full ${
+    errors.notes ? "border-red-500" : "border-gray-300"
+  }`}
+/>
+{errors.notes && <p className="text-red-500">Notes are required</p>} 
         </div>
 
         <div className="flex justify-between">
