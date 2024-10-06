@@ -55,6 +55,11 @@ const Student = sequelize.define(
       type: DataTypes.TEXT,
       allowNull: true
     },
+    logs: {
+      type: DataTypes.JSON, // Use JSON to store an array of logs
+      allowNull: true,
+      defaultValue: [] // Initialize as an empty array
+    },
     isActive: {
       type: DataTypes.BOOLEAN,
       allowNull: false,

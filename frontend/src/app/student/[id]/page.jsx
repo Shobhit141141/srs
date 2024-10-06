@@ -9,10 +9,11 @@ import {
 } from "@/queries/graphqlQueires";
 import { useNotifyAndNavigate } from "@/utils/notify_and_navigate";
 import { Badge, Button } from "@radix-ui/themes";
-import { Trash2 } from "lucide-react";
+import { Edit2Icon, Trash2 } from "lucide-react";
 import Loader from "@/ui/Loader";
-import { Chip, Input } from "@nextui-org/react";
+import { Accordion, AccordionItem, Chip, Input } from "@nextui-org/react";
 import Link from "next/link";
+import { UpdateIcon } from "@radix-ui/react-icons";
 
 const StudentDetailsPage = ({ params }) => {
   const { id } = params;
@@ -139,6 +140,7 @@ const StudentDetailsPage = ({ params }) => {
               </Link>
             </span>
           </div>
+
           <div className="flex justify-between">
             <strong className="text-yellow-400">Fees:</strong>
             <Chip color="warning" variant="flat" className="text-white">
@@ -171,6 +173,16 @@ const StudentDetailsPage = ({ params }) => {
         >
           <Trash2 className=" scale-[0.9]" /> Delete Student
         </Button>
+
+        <Link href={`/update-student/${student.id}`}>
+          <Button
+            color="blue"
+            variant="surface"
+            className="px-4 py-2 flex items-center ml-1"
+          >
+            <Edit2Icon className="scale-[0.7]" /> Update
+          </Button>
+        </Link>
 
         <div className="flex items-center mr-1">
           <h2 className="text-lg font-semibold mr-2">Status:</h2>
@@ -255,6 +267,30 @@ const StudentDetailsPage = ({ params }) => {
         <h2 className="text-lg font-semibold mb-2 text-yellow-500">Notes</h2>
         <p className="text-white ">{student.notes || "No notes available."}</p>
       </div>
+
+      <div className="mt-8">
+  <h2 className="text-lg font-semibold mb-2 text-yellow-500">Logs</h2>
+  <div type="multiple" className="border rounded-md bg-[#151515]">
+    {student.logs.length === 0 ? (
+      <div className="p-4 text-white text-center">No logs available.</div>
+    ) : (
+      student.logs.map((log, index) => (
+        <div key={index} value={`item-${index}`}>
+          <div
+            className={`p-2 font-mono ${
+              log.includes('Made active') ? 'text-green-500' : 
+              log.includes('Made inactive') ? 'text-red-500' : 
+              'text-gray-300'
+            }`}
+          >
+            - {log}
+          </div>
+        </div>
+      ))
+    )}
+  </div>
+</div>
+
     </div>
   );
 };

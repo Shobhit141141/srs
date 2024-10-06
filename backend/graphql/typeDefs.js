@@ -2,15 +2,17 @@ const { gql } = require('apollo-server-express');
 
 const typeDefs = gql`
   scalar Date
+
   type Student {
     id: ID!
     name: String!
     joiningDate: String!
     contactInfo: String!
     class: String!
-    feesAmount: Float! 
+    feesAmount: Float!
     notes: String
     timeSlot: String!
+    logs: [String!]!
     feesRecords: [FeesRecord!]!
     isActive: Boolean!
   }

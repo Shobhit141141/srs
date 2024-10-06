@@ -78,7 +78,15 @@ const resolvers = {
         timeSlot
       } = input;
 
-      if (!name || !joiningDate || !contactInfo || !className || !timeSlot || !feesAmount || !notes) {
+      if (
+        !name ||
+        !joiningDate ||
+        !contactInfo ||
+        !className ||
+        !timeSlot ||
+        !feesAmount ||
+        !notes
+      ) {
         throw new Error(
           'All fields are required: name, joiningDate, contactInfo, class, timeSlot.'
         );
@@ -96,24 +104,66 @@ const resolvers = {
         class: className,
         feesAmount,
         notes,
-        timeSlot
+        timeSlot,
+        logs: [`Student created: ${name}`]
       });
     },
 
     async updateStudent(
       _,
-      { id, name, contactInfo, class: className,feesAmount,notes, timeSlot }
+      { id, name, contactInfo, class: className, feesAmount, notes, timeSlot }
     ) {
       const student = await Student.findByPk(id);
       if (!student) throw new Error('Student not found');
 
+      const updates = {};
+      const logsToUpdate = [];
+      if (name && name !== student.name) {
+        updates.name = name;
+        logsToUpdate.push(
+          `Updated name from ${student.name} to ${name} at ${new Date().toLocaleString()}`
+        );
+      }
+
+      if (contactInfo && contactInfo !== student.contactInfo) {
+        updates.contactInfo = contactInfo;
+        logsToUpdate.push(
+          `Updated contact info from ${student.contactInfo} to ${contactInfo} at ${new Date().toLocaleString()}`
+        );
+      }
+
+      if (className && className !== student.class) {
+        updates.class = className;
+        logsToUpdate.push(
+          `Updated class from ${student.class} to ${className} at ${new Date().toLocaleString()}`
+        );
+      }
+
+      if (feesAmount !== undefined && feesAmount !== student.feesAmount) {
+        updates.feesAmount = feesAmount;
+        logsToUpdate.push(
+          `Updated fees amount from ${student.feesAmount} to ${feesAmount} at ${new Date().toLocaleString()}`
+        );
+      }
+
+      if (timeSlot && timeSlot !== student.timeSlot) {
+        updates.timeSlot = timeSlot;
+        logsToUpdate.push(
+          `Updated time slot from ${student.timeSlot} to ${timeSlot} at ${new Date().toLocaleString()}`
+        );
+      }
+
+      if (notes && notes !== student.notes) {
+        updates.notes = notes;
+        logsToUpdate.push(
+          `Added ${notes} in notes at ${new Date().toLocaleString()}`
+        );
+      }
+
+      // Update the student record and log changes
       await student.update({
-        name: name || student.name,
-        contactInfo: contactInfo || student.contactInfo,
-        class: className || student.class,
-        feesAmount: feesAmount || student.feesAmount,
-        notes : notes || student.notes,
-        timeSlot: timeSlot || student.timeSlot
+        ...updates,
+        logs: [...student.logs, ...logsToUpdate]
       });
 
       return student;
@@ -122,13 +172,22 @@ const resolvers = {
     async toggleStudentActive(_, { id }) {
       const student = await Student.findByPk(id);
       if (!student) throw new Error('Student not found');
-
+      const logsToUpdate = [];
       student.isActive = !student.isActive;
+      if (student.isActive) {
+        logsToUpdate.push(`Made active at ${new Date().toLocaleString()}`);
+      } else {
+        logsToUpdate.push(`Made inactive at ${new Date().toLocaleString()}`);
+      }
+      await student.update({
+        logs: [...student.logs, ...logsToUpdate]
+      });
       await student.save();
 
       return { ...student.get(), isActive: student.isActive };
     },
 
+ 
     async deleteStudent(_, { id }) {
       const feesRecords = await FeesRecord.findAll({
         where: { studentId: id }

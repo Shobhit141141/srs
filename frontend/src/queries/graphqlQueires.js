@@ -23,9 +23,26 @@ export const CREATE_FEES_RECORD_MUTATION = gql`
     }
   }
 `;
+
 export const UPDATE_STUDENT_MUTATION = gql`
-  mutation UpdateStudent($id: ID!, $input: UpdateStudentInput!) {
-    updateStudent(id: $id, input: $input) {
+  mutation UpdateStudent(
+    $id: ID!
+    $name: String
+    $contactInfo: String
+    $class: String
+    $feesAmount: Float
+    $notes: String
+    $timeSlot: String
+  ) {
+    updateStudent(
+      id: $id
+      name: $name
+      contactInfo: $contactInfo
+      class: $class
+      feesAmount: $feesAmount
+      notes: $notes
+      timeSlot: $timeSlot
+    ) {
       id
       name
       contactInfo
@@ -33,7 +50,6 @@ export const UPDATE_STUDENT_MUTATION = gql`
       feesAmount
       notes
       timeSlot
-      isActive
     }
   }
 `;
@@ -56,6 +72,7 @@ export const GET_STUDENT_BY_ID_QUERY = gql`
         date_of_payment
         status
       }
+      logs
     }
   }
 `;
