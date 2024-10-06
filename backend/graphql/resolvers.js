@@ -205,15 +205,38 @@ const resolvers = {
       _,
       { studentId, studentName, amount, date_of_payment, status }
     ) {
-      console.log(studentName);
-      return await FeesRecord.create({
+      const student = await Student.findByPk(studentId);
+      if (!student) throw new Error('Student not found');
+    
+      // Prepare the fees record
+      const feesRecordData = {
         studentId,
         studentName,
         amount,
         date_of_payment,
-        status
-      });
+        status,
+      };
+    
+      try {
+        // Create the FeesRecord
+        const feesRecord = await FeesRecord.create(feesRecordData);
+    
+        // If successful, log the payment
+        const logsToUpdate = [];
+        logsToUpdate.push(`Fees of ${amount} paid on ${date_of_payment}`);
+    
+        // Update student logs
+        await student.update({
+          logs: [...student.logs, ...logsToUpdate],
+        });
+    
+        return feesRecord; // Return the created FeesRecord
+      } catch (error) {
+        // Handle the error (e.g., logging or throwing a custom error)
+        throw new Error('Failed to create fees record: ' + error.message);
+      }
     },
+    
 
     async updateFeesRecord(_, { id, amount, status }) {
       const feesRecord = await FeesRecord.findByPk(id);
