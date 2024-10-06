@@ -9,7 +9,7 @@ import {
 } from "@/queries/graphqlQueires";
 import { useNotifyAndNavigate } from "@/utils/notify_and_navigate";
 import { Badge, Button } from "@radix-ui/themes";
-import { Edit2Icon, Trash2 } from "lucide-react";
+import { Edit2Icon, Phone, Trash2 } from "lucide-react";
 import Loader from "@/ui/Loader";
 import { Accordion, AccordionItem, Chip, Input } from "@nextui-org/react";
 import Link from "next/link";
@@ -129,12 +129,17 @@ const StudentDetailsPage = ({ params }) => {
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="flex justify-between">
+            <strong className="text-yellow-400">ID:</strong>
+            <span className="text-white">{student.id}</span>
+          </div>
+          <div className="flex justify-between">
             <strong className="text-yellow-400">Name:</strong>
             <span className="text-white">{student.name}</span>
           </div>
           <div className="flex justify-between">
             <strong className="text-yellow-400">Contact Info:</strong>
-            <span className="text-blue-400 underline">
+            <span className="text-blue-400 flex flex-row gap-1 items-center">
+              <Phone className="scale-[0.7]"/>{" "}
               <Link href={`tel:${student.contactInfo}`}>
                 {student.contactInfo}
               </Link>
@@ -161,39 +166,17 @@ const StudentDetailsPage = ({ params }) => {
               {formatDate(student.joiningDate)}
             </span>
           </div>
-        </div>
-      </div>
-
-      <div className="flex justify-between items-center mb-6">
-        <Button
-          color="red"
-          onClick={handleDeleteStudent}
-          variant="surface"
-          className="px-4 py-2 flex items-center ml-1"
-        >
-          <Trash2 className=" scale-[0.9]" /> Delete Student
-        </Button>
-
-        <Link href={`/update-student/${student.id}`}>
-          <Button
-            color="blue"
-            variant="surface"
-            className="px-4 py-2 flex items-center ml-1"
-          >
-            <Edit2Icon className="scale-[0.7]" /> Update
-          </Button>
-        </Link>
-
-        <div className="flex items-center mr-1">
-          <h2 className="text-lg font-semibold mr-2">Status:</h2>
-          <Badge
-            color={student.isActive ? "green" : "red"}
-            onClick={toggleActiveStatus}
-            className="cursor-pointer px-2 py-1"
-            variant="solid"
-          >
-            {student.isActive ? "Active" : "Inactive"}
-          </Badge>
+          <div className="flex justify-between">
+            <strong className="text-yellow-400">Status:</strong>
+            <Badge
+              color={student.isActive ? "green" : "red"}
+              onClick={toggleActiveStatus}
+              className="cursor-pointer px-2 py-1"
+              variant="solid"
+            >
+              {student.isActive ? "Active" : "Inactive"}
+            </Badge>
+          </div>
         </div>
       </div>
 
@@ -268,29 +251,63 @@ const StudentDetailsPage = ({ params }) => {
         <p className="text-white ">{student.notes || "No notes available."}</p>
       </div>
 
-      <div className="mt-8">
-  <h2 className="text-lg font-semibold mb-2 text-yellow-500">Logs</h2>
-  <div type="multiple" className="border rounded-md bg-[#151515]">
-    {student.logs.length === 0 ? (
-      <div className="p-4 text-white text-center">No logs available.</div>
-    ) : (
-      student.logs.map((log, index) => (
-        <div key={index} value={`item-${index}`}>
-          <div
-            className={`p-2 font-mono ${
-              log.includes('Made active') ? 'text-green-500' : 
-              log.includes('Made inactive') ? 'text-red-500' : 
-              'text-gray-300'
-            }`}
-          >
-            - {log}
-          </div>
-        </div>
-      ))
-    )}
-  </div>
-</div>
+      <div className="flex justify-start gap-2 items-center my-8">
+        <Button
+          color="red"
+          onClick={handleDeleteStudent}
+          variant="surface"
+          className="px-4 py-2 flex items-center ml-1"
+        >
+          <Trash2 className=" scale-[0.9]" /> Delete Student
+        </Button>
 
+        <Link href={`/update-student/${student.id}`}>
+          <Button
+            color="blue"
+            variant="surface"
+            className="px-4 py-2 flex items-center ml-1"
+          >
+            <Edit2Icon className="scale-[0.7]" /> Update
+          </Button>
+        </Link>
+
+        {/* <div className="flex items-center mr-1">
+          <h2 className="text-lg font-semibold mr-2">Status:</h2>
+          <Badge
+            color={student.isActive ? "green" : "red"}
+            onClick={toggleActiveStatus}
+            className="cursor-pointer px-2 py-1"
+            variant="solid"
+          >
+            {student.isActive ? "Active" : "Inactive"}
+          </Badge>
+        </div> */}
+      </div>
+
+      <div className="">
+        <h2 className="text-lg font-semibold mb-2 text-yellow-500">Logs</h2>
+        <div type="multiple" className="border rounded-md bg-[#151515]">
+          {student.logs.length === 0 ? (
+            <div className="p-4 text-white text-center">No logs available.</div>
+          ) : (
+            student.logs.map((log, index) => (
+              <div key={index} value={`item-${index}`}>
+                <div
+                  className={`p-2 font-mono ${
+                    log.includes("Made active")
+                      ? "text-green-500"
+                      : log.includes("Made inactive")
+                      ? "text-red-500"
+                      : "text-gray-300"
+                  }`}
+                >
+                  - {log}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
     </div>
   );
 };
