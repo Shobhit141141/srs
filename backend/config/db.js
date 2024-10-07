@@ -25,7 +25,7 @@ sequelize
     console.log('Connected to Aiven PostgreSQL');
     
     // Once the connection is authenticated, sync the models
-    return sequelize.sync();  // Sync the database (create tables if they don't exist)
+    return sequelize.sync({ alter: true });  
   })
   .then(() => {
     console.log('Database synchronized successfully.');

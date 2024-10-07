@@ -1,6 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 const Student = require('./Student');
+const Teacher = require('./Teacher');
 
 const FeesRecord = sequelize.define(
   'FeesRecord',
@@ -10,38 +11,38 @@ const FeesRecord = sequelize.define(
       allowNull: false,
       references: {
         model: Student, // reference the Student model
-        key: 'id',
-      },
+        key: 'id'
+      }
     },
-    studentName:{
+    studentName: {
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull: true
     },
     amount: {
       type: DataTypes.FLOAT,
-      allowNull: false,
+      allowNull: false
     },
     date_of_payment: {
       type: DataTypes.DATE,
-      allowNull: false,
+      allowNull: false
     },
     status: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: false
     },
+    teacherId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: Teacher,
+        key: 'id'
+      }
+    }
   },
   {}
 );
 
 FeesRecord.belongsTo(Student, { foreignKey: 'studentId' });
-
-sequelize.sync({ alter: true })
-  .then(() => {
-    console.log('FeesRecord table synced with database.');
-  })
-  .catch((error) => {
-    console.error('Error syncing FeesRecord table:', error);
-  });
-
+FeesRecord.belongsTo(Teacher, { foreignKey: 'teacherId' });
 
 module.exports = FeesRecord;

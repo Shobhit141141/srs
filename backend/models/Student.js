@@ -1,5 +1,7 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
+const FeesRecord = require('./FeesRecord');
+const Teacher = require('./Teacher');
 const Student = sequelize.define(
   'Student',
   {
@@ -31,7 +33,7 @@ const Student = sequelize.define(
     },
     feesAmount: {
       type: DataTypes.FLOAT,
-      allowNull:true 
+      allowNull: true
     },
     timeSlot: {
       type: DataTypes.ENUM(
@@ -64,19 +66,18 @@ const Student = sequelize.define(
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: true // Default to active
+    },
+    teacherId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: Teacher, // Reference the Teacher model
+        key: 'id'
+      }
     }
   },
   {}
 );
+Student.belongsTo(Teacher, { foreignKey: 'teacherId' });
 
-// sequelize
-//   .sync({ alter: true })
-//   .then(() => {
-//     console.log('Students table synced with database.');
-//   })
-//   .catch(error => {
-//     console.error('Error syncing Students table:', error);
-//   });
-
-// Student.hasMany(FeesRecord, { foreignKey: 'studentId' });
 module.exports = Student;

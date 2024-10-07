@@ -1,6 +1,13 @@
 const FeesRecord = require('../models/FeesRecord');
 const Student = require('../models/Student');
 const { Op } = require('sequelize');
+const Teacher = require('../models/Teacher');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+
+// Secret key for signing JWTs
+const SECRET_KEY = 'your_secret_key';
+
 const resolvers = {
   Query: {
     async getStudentById(_, { id }) {
@@ -67,6 +74,56 @@ const resolvers = {
     }
   },
   Mutation: {
+    async signupTeacher(_, { username, email, password }) {
+      // Check if the teacher already exists
+      const existingTeacher = await Teacher.findOne({
+        where: {
+          [Op.or]: [{ email }, { username }]
+        }
+      });
+
+      if (existingTeacher) {
+        throw new Error('Teacher already exists with this email or username.');
+      }
+
+      // Hash the password before saving
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      // Create a new teacher
+      const teacher = await Teacher.create({
+        username,
+        email,
+        password: hashedPassword
+      });
+
+      // Generate a JWT token
+      const token = jwt.sign({ teacherId: teacher.id }, SECRET_KEY, {
+        expiresIn: '1d'
+      });
+
+      return { token, teacher };
+    },
+
+    async loginTeacher(_, { email, password }) {
+      // Find the teacher by email
+      const teacher = await Teacher.findOne({ where: { email } });
+      if (!teacher) {
+        throw new Error('Teacher not found.');
+      }
+
+      // Check if the password matches
+      const validPassword = await bcrypt.compare(password, teacher.password);
+      if (!validPassword) {
+        throw new Error('Invalid password.');
+      }
+
+      // Generate a JWT token
+      const token = jwt.sign({ teacherId: teacher.id }, SECRET_KEY, {
+        expiresIn: '1d'
+      });
+
+      return { token, teacher };
+    },
     async createStudent(_, { input }) {
       const {
         name,
@@ -187,7 +244,6 @@ const resolvers = {
       return { ...student.get(), isActive: student.isActive };
     },
 
- 
     async deleteStudent(_, { id }) {
       const feesRecords = await FeesRecord.findAll({
         where: { studentId: id }
@@ -207,36 +263,35 @@ const resolvers = {
     ) {
       const student = await Student.findByPk(studentId);
       if (!student) throw new Error('Student not found');
-    
+
       // Prepare the fees record
       const feesRecordData = {
         studentId,
         studentName,
         amount,
         date_of_payment,
-        status,
+        status
       };
-    
+
       try {
         // Create the FeesRecord
         const feesRecord = await FeesRecord.create(feesRecordData);
-    
+
         // If successful, log the payment
         const logsToUpdate = [];
         logsToUpdate.push(`Fees of ${amount} paid on ${date_of_payment}`);
-    
+
         // Update student logs
         await student.update({
-          logs: [...student.logs, ...logsToUpdate],
+          logs: [...student.logs, ...logsToUpdate]
         });
-    
+
         return feesRecord; // Return the created FeesRecord
       } catch (error) {
         // Handle the error (e.g., logging or throwing a custom error)
         throw new Error('Failed to create fees record: ' + error.message);
       }
     },
-    
 
     async updateFeesRecord(_, { id, amount, status }) {
       const feesRecord = await FeesRecord.findByPk(id);

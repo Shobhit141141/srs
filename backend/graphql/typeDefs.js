@@ -26,6 +26,13 @@ const typeDefs = gql`
     status: String!
   }
 
+  type Teacher {
+    id: ID!
+    username: String!
+    email: String!
+    password: String!
+  }
+
   type MonthlyFeesReport {
     paidFeesCount: Int!
     unpaidFeesCount: Int!
@@ -50,8 +57,20 @@ const typeDefs = gql`
     notes: String
     timeSlot: String!
   }
-
+  type AuthPayload {
+    token: String!
+    teacher: Teacher
+  }
   type Mutation {
+    # Teacher signup
+    signupTeacher(
+      username: String!
+      email: String!
+      password: String!
+    ): AuthPayload
+
+    # Teacher login
+    loginTeacher(email: String!, password: String!): AuthPayload
     createStudent(input: CreateStudentInput!): Student
     updateStudent(
       id: ID!
