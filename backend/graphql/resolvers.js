@@ -4,28 +4,49 @@ const { Op } = require('sequelize');
 const Teacher = require('../models/Teacher');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-
+const { authMiddleware } = require('../middleware/authMiddleware');
 // Secret key for signing JWTs
 const SECRET_KEY = 'your_secret_key';
 
 const resolvers = {
   Query: {
-    async getStudentById(_, { id }) {
-      return await Student.findByPk(id, {
+    async getStudentById(_, { id }, context) {
+      const teacher = context.teacher;
+
+      const student = await Student.findByPk(id, {
         // include: FeesRecord,
         // required: false,
       });
+
+      if (!student) {
+        throw new Error('Student not found');
+      }
+      if (student.teacherId !== teacher.id) {
+        throw new Error('You are not authorized to view this student record.');
+      }
+      return student;
     },
-    async getAllStudents() {
+    async getAllStudents(_, __, context) {
+      const teacher = context.teacher;
+
       return await Student.findAll({
-        // include: FeesRecord,
-        // required: false,
+        where: {
+          teacherId: teacher.id
+        }
       });
     },
-    async getFeesRecords(_, { studentId }) {
-      return await FeesRecord.findAll({
+    async getFeesRecords(_, { studentId }, context) {
+      const teacher = context.teacher;
+      const student = await FeesRecord.findAll({
         where: { studentId }
       });
+      if (!student) {
+        throw new Error('Student not found');
+      }
+      if (student.teacherId !== teacher.id) {
+        throw new Error('You are not authorized to view this student record.');
+      }
+      return student;
     },
 
     async studentsByTimeSlot(_, { timeSlot }) {
@@ -38,26 +59,52 @@ const resolvers = {
       return students;
     },
 
-    async getMonthlyFeesReport(_, { year, month }) {
+
+    getTeacherById: (_, { id }, context) => {
+      const teacher = context.teacher;
+
+      console.log(teacher.id);
+      console.log(id);  
+      if(!teacher) {
+        throw new Error('No teachers found');
+      }
+      console.log(teacher.id == id);
+      if(teacher.id != id) {
+        throw new Error('You are not authorized to view this teacher record.');
+      }
+      return teacher;
+    },
+
+    async getMonthlyFeesReport(_, { year, month }, context) {
+      const teacherId = context.teacher.id; // Get the logged-in teacher's ID
+
       // Calculate the start and end of the month
       const startDate = new Date(year, month - 1, 1); // First day of the month
       const endDate = new Date(year, month, 0); // Last day of the month
 
-      // Fetch all fees records for the specified month
+      // Fetch all fees records for the specified month and teacher's students
       const feesRecords = await FeesRecord.findAll({
         where: {
           date_of_payment: {
             [Op.between]: [startDate, endDate]
+          },
+          '$Student.teacherId$': teacherId // Ensure the student belongs to the teacher
+        },
+        include: [
+          {
+            model: Student, // Join with the Student model
+            required: true // Only include fees records with valid students
           }
-        }
+        ]
       });
 
       // Get the student IDs who have paid fees
       const paidStudentIds = feesRecords.map(record => record.studentId);
 
-      // Fetch students who haven't paid fees in the given month
+      // Fetch students of this teacher who haven't paid fees in the given month
       const unpaidStudents = await Student.findAll({
         where: {
+          teacherId: teacherId, // Filter students by teacher
           id: {
             [Op.notIn]: paidStudentIds
           }
@@ -124,7 +171,7 @@ const resolvers = {
 
       return { token, teacher };
     },
-    async createStudent(_, { input }) {
+    async createStudent(_, { input }, context) {
       const {
         name,
         joiningDate,
@@ -162,17 +209,24 @@ const resolvers = {
         feesAmount,
         notes,
         timeSlot,
-        logs: [`Student created: ${name}`]
+        logs: [`Student created: ${name}`],
+        teacherId: context.teacher.id
       });
     },
 
     async updateStudent(
       _,
-      { id, name, contactInfo, class: className, feesAmount, notes, timeSlot }
+      { id, name, contactInfo, class: className, feesAmount, notes, timeSlot },
+      context
     ) {
+      const teacher = context.teacher;
       const student = await Student.findByPk(id);
       if (!student) throw new Error('Student not found');
-
+      if (student.teacherId !== teacher.id) {
+        throw new Error(
+          'You are not authorized to update this student record.'
+        );
+      }
       const updates = {};
       const logsToUpdate = [];
       if (name && name !== student.name) {
@@ -226,9 +280,17 @@ const resolvers = {
       return student;
     },
 
-    async toggleStudentActive(_, { id }) {
+    async toggleStudentActive(_, { id }, context) {
+      const teacher = context.teacher;
+
       const student = await Student.findByPk(id);
       if (!student) throw new Error('Student not found');
+
+      if (student.teacherId !== teacher.id) {
+        throw new Error(
+          'You are not authorized to toggle this student status.'
+        );
+      }
       const logsToUpdate = [];
       student.isActive = !student.isActive;
       if (student.isActive) {
@@ -244,7 +306,8 @@ const resolvers = {
       return { ...student.get(), isActive: student.isActive };
     },
 
-    async deleteStudent(_, { id }) {
+    async deleteStudent(_, { id }, context) {
+      const teacher = context.teacher;
       const feesRecords = await FeesRecord.findAll({
         where: { studentId: id }
       });
@@ -253,14 +316,19 @@ const resolvers = {
       const student = await Student.findByPk(id);
       if (!student) throw new Error('Student not found');
 
+      if (student.teacherId !== teacher.id) {
+        throw new Error('You are not authorized to delete this student.');
+      }
       await student.destroy();
       return `Student with id ${id} deleted successfully`;
     },
 
     async createFeesRecord(
       _,
-      { studentId, studentName, amount, date_of_payment, status }
+      { studentId, studentName, amount, date_of_payment, status }, context
     ) {
+      const teacher = context.teacher;
+      const id = teacher.id;
       const student = await Student.findByPk(studentId);
       if (!student) throw new Error('Student not found');
 
@@ -270,7 +338,8 @@ const resolvers = {
         studentName,
         amount,
         date_of_payment,
-        status
+        status,
+        teacherId: id
       };
 
       try {

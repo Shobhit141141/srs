@@ -6,6 +6,7 @@ import { Button } from "@nextui-org/react";
 import { CREATE_STUDENT_MUTATION } from "@/queries/graphqlQueires";
 import { useNotifyAndNavigate } from "@/utils/notify_and_navigate";
 import { useRouter } from "next/navigation";
+import useClient from "@/utils/graphql";
 
 const CreateStudentPage = () => {
   const {
@@ -16,6 +17,7 @@ const CreateStudentPage = () => {
   } = useForm();
   const [message, setMessage] = useState("");
   const notifyAndNavigate = useNotifyAndNavigate();
+  const client = useClient();
 
   const onSubmit = async (data) => {
     try {

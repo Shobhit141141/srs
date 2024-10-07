@@ -1,5 +1,4 @@
 "use client";
-import client from "@/utils/graphql";
 import { useEffect, useState } from "react";
 import {
   CREATE_FEES_RECORD_MUTATION,
@@ -11,9 +10,9 @@ import { useNotifyAndNavigate } from "@/utils/notify_and_navigate";
 import { Badge, Button } from "@radix-ui/themes";
 import { Edit2Icon, Phone, Trash2 } from "lucide-react";
 import Loader from "@/ui/Loader";
-import { Accordion, AccordionItem, Chip, Input } from "@nextui-org/react";
+import { Chip, Input } from "@nextui-org/react";
 import Link from "next/link";
-import { UpdateIcon } from "@radix-ui/react-icons";
+import useClient from "@/utils/graphql";
 
 const StudentDetailsPage = ({ params }) => {
   const { id } = params;
@@ -25,10 +24,12 @@ const StudentDetailsPage = ({ params }) => {
   const [feesRecords, setFeesRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const notifyAndNavigate = useNotifyAndNavigate();
+  const client = useClient();
 
   useEffect(() => {
     const fetchStudent = async () => {
       try {
+
         const response = await client.request(GET_STUDENT_BY_ID_QUERY, { id });
         setStudent(response.getStudentById);
         setFeesRecords(response.getStudentById.feesRecords || []);
@@ -39,8 +40,10 @@ const StudentDetailsPage = ({ params }) => {
       }
     };
 
-    fetchStudent();
-  }, [id]);
+    if (client) {
+      fetchStudent();
+    }
+  }, [id, client]);
 
   const handleFeesRecordSubmit = async (e) => {
     e.preventDefault();
@@ -139,7 +142,7 @@ const StudentDetailsPage = ({ params }) => {
           <div className="flex justify-between">
             <strong className="text-yellow-400">Contact Info:</strong>
             <span className="text-blue-400 flex flex-row gap-1 items-center">
-              <Phone className="scale-[0.7]"/>{" "}
+              <Phone className="scale-[0.7]" />{" "}
               <Link href={`tel:${student.contactInfo}`}>
                 {student.contactInfo}
               </Link>

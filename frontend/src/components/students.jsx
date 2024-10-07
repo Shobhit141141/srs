@@ -1,11 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
-import client from "@/utils/graphql"; // Adjust the path as necessary
 import Link from "next/link";
 import { Table } from "@radix-ui/themes";
 import Loader from "@/ui/Loader";
 import { Chip, Input } from "@nextui-org/react";
 import { SearchIcon } from "lucide-react";
+import useClient from "@/utils/graphql";
 
 const GET_ALL_STUDENTS_QUERY = `
   query {
@@ -29,58 +29,56 @@ const StudentsPage = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [timeSlotFilter, setTimeSlotFilter] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const client = useClient();
 
+  console.log(client);
 
   const fetchStudents = async () => {
     try {
-      setLoading(true);
       const response = await client.request(GET_ALL_STUDENTS_QUERY);
       setStudents(response.getAllStudents);
-      setFilteredStudents(response.getAllStudents); // Set initial filtered students
+      setFilteredStudents(response.getAllStudents);
     } catch (error) {
       setError(`Error fetching students: ${error.message}`);
     } finally {
-      // Wait for 1 second before setting loading to false
-      setTimeout(() => {
-        setLoading(false);
-      }, 1000);
+      setLoading(false);
     }
   };
 
   useEffect(() => {
+    if (client)
     fetchStudents();
-  }, []);
+  }, [client]);
 
   useEffect(() => {
     let updatedStudents = students;
-  
+
     // Apply status filter
     if (statusFilter === "active") {
       updatedStudents = updatedStudents.filter((student) => student.isActive);
     } else if (statusFilter === "inactive") {
       updatedStudents = updatedStudents.filter((student) => !student.isActive);
     }
-  
+
     // Apply time slot filter
     if (timeSlotFilter) {
       updatedStudents = updatedStudents.filter(
         (student) => student.timeSlot === timeSlotFilter
       );
     }
-  
+
     // Apply search query filter
     if (searchQuery) {
       updatedStudents = updatedStudents.filter((student) =>
         student.name.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
-  
+
     // Sort by time slot
     updatedStudents.sort((a, b) => (a.timeSlot > b.timeSlot ? 1 : -1));
-  
+
     setFilteredStudents(updatedStudents);
   }, [statusFilter, timeSlotFilter, searchQuery, students]);
-  
 
   if (loading) {
     return <Loader />;
@@ -155,7 +153,7 @@ const StudentsPage = () => {
         placeholder="Type to search..."
         startContent={<SearchIcon className="scale-[0.8]" />}
         value={searchQuery} // Bind the search query state
-        onChange={(e) => setSearchQuery(e.target.value)} 
+        onChange={(e) => setSearchQuery(e.target.value)}
       />
 
       {filteredStudents.length === 0 ? (
@@ -163,7 +161,10 @@ const StudentsPage = () => {
           No Student found
         </div>
       ) : (
-        <Table.Root className="min-w-full border-collapse border border-gray-500 rounded-md mt-4" variant="surface">
+        <Table.Root
+          className="min-w-full border-collapse border border-gray-500 rounded-md mt-4"
+          variant="surface"
+        >
           <Table.Header>
             <Table.Row className="text-yellow-400">
               <Table.ColumnHeaderCell>ID</Table.ColumnHeaderCell>
@@ -178,10 +179,7 @@ const StudentsPage = () => {
               <Table.Row key={student.id} className="cursor-pointer">
                 <Table.ColumnHeaderCell>{index + 1}</Table.ColumnHeaderCell>
                 <Table.ColumnHeaderCell className="hover:text-blue-400 hover:underline">
-
-                  <Link href={`/student/${student.id}`}>
-                  {student.name}
-                  </Link>
+                  <Link href={`/student/${student.id}`}>{student.name}</Link>
                 </Table.ColumnHeaderCell>
                 <Table.ColumnHeaderCell>
                   {student.timeSlot}

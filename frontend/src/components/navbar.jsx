@@ -10,8 +10,10 @@ import {
 } from "@radix-ui/react-navigation-menu"; // Radix UI components
 import { ExitIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
 const CustomNavbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const {teacher,loading} = useAuth();
 
   const navLinks = [
     { name: "Home", href: "/", icon: Home },
@@ -28,9 +30,9 @@ const CustomNavbar = () => {
           <NavigationMenu>
             <NavigationMenuList>
               <NavigationMenuItem>
-                <NavigationMenuLink href="/">
+                <Link href="/">
                   <img src="/srs.png" alt="Logo" className="h-10 w-10 object-cover" />
-                </NavigationMenuLink>
+                </Link>
               </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>

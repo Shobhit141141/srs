@@ -1,7 +1,7 @@
 "use client";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
-import client from "@/utils/graphql";
+import useClient from "@/utils/graphql"; 
 import { Button, Spinner } from "@nextui-org/react"; // Import Spinner for loading
 import { useNotifyAndNavigate } from "@/utils/notify_and_navigate";
 import { useRouter } from "next/navigation";
@@ -24,7 +24,7 @@ const UpdateStudentPage = ({ params }) => {
   // State to hold the original student data
   const [originalData, setOriginalData] = useState(null);
   const [loading, setLoading] = useState(true); // Loading state
-
+const client = useClient(); // Get the client
   useEffect(() => {
     const fetchStudent = async () => {
       setLoading(true); // Start loading
@@ -44,9 +44,8 @@ const UpdateStudentPage = ({ params }) => {
         setLoading(false); // Stop loading
       }
     };
-
-    fetchStudent();
-  }, [studentId, setValue]);
+if (client) fetchStudent(); // Fetch the student
+  }, [studentId, setValue, client]);
 
   const onSubmit = async (data) => {
     try {

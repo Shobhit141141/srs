@@ -8,8 +8,7 @@ import { Table } from "@radix-ui/themes";
 import {  Chip, Input } from "@nextui-org/react";
 import Link from "next/link";
 import { SearchIcon } from "lucide-react";
-
-const endpoint = "http://localhost:4000/graphql"; // Your GraphQL server endpoint
+import useClient from "@/utils/graphql";
 
 const FeesReportPage = () => {
   const [year, setYear] = useState(new Date().getFullYear());
@@ -33,11 +32,12 @@ const FeesReportPage = () => {
     { value: 11, label: "November" },
     { value: 12, label: "December" },
   ];
+  const client = useClient();
 
   const fetchReport = async () => {
     setLoading(true);
     try {
-      const data = await request(endpoint, GET_MONTHLY_FEES_REPORT, {
+      const data = await client.request( GET_MONTHLY_FEES_REPORT, {
         year,
         month,
       });

@@ -1,8 +1,16 @@
+// src/pages/index.js (Home page)
+import ProtectedRoute from "@/components/Protected";
 import StudentsPage from "@/components/students";
-export default function () {
+
+function Home() {
   return (
-    <div>
-      <StudentsPage/>
-    </div>
+    <ProtectedRoute>
+      <div>
+        <StudentsPage />
+      </div>
+    </ProtectedRoute>
   );
 }
+
+// Wrap the Home component with the `withAuth` HOC to protect it
+export default Home;

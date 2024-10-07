@@ -2,11 +2,15 @@ const jwt = require('jsonwebtoken');
 const Teacher = require('../models/Teacher');
 const SECRET_KEY = 'your_secret_key'; // Make sure this is securely stored
 
-const authMiddleware = async (resolve, parent, args, context, info) => {
-  const authHeader = context.req.headers.authorization;
+const authMiddleware = async (req) => {
+  const authHeader = req.headers.authorization;
 
   if (!authHeader) {
     throw new Error('Authorization header is missing.');
+  }
+
+  if (req.body.operationName === 'SignupTeacher' || req.body.operationName === 'LoginTeacher') {
+    return {};
   }
 
   const token = authHeader.split(' ')[1];
@@ -18,8 +22,9 @@ const authMiddleware = async (resolve, parent, args, context, info) => {
       throw new Error('Invalid token or teacher does not exist.');
     }
 
-    context.teacher = teacher; // Attach the authenticated teacher to the context
-    return resolve(parent, args, context, info); // Proceed to the next resolver
+    console.log('Authenticated teacher:', teacher.username);
+
+    return teacher; // Return the authenticated teacher
   } catch (err) {
     throw new Error('Authentication failed: ' + err.message);
   }

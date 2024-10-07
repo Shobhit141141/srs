@@ -53,6 +53,15 @@ export const UPDATE_STUDENT_MUTATION = gql`
     }
   }
 `;
+export const GET_TEACHER_BY_ID = gql`
+  query GetTeacherById($id: ID!) {
+    getTeacherById(id: $id) {
+      id
+      username
+      email
+    }
+  }
+`;
 
 export const GET_STUDENT_BY_ID_QUERY = gql`
   query GetStudentById($id: ID!) {

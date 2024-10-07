@@ -46,6 +46,7 @@ const typeDefs = gql`
     getFeesRecords(studentId: ID!): [FeesRecord!]
     studentsByTimeSlot(timeSlot: String!): [Student!]!
     getMonthlyFeesReport(year: Int!, month: Int!): MonthlyFeesReport!
+    getTeacherById(id: ID!): Teacher
   }
 
   input CreateStudentInput {
