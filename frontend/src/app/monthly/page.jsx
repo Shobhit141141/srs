@@ -9,6 +9,7 @@ import {  Chip, Input } from "@nextui-org/react";
 import Link from "next/link";
 import { SearchIcon } from "lucide-react";
 import useClient from "@/utils/graphql";
+import ProtectedRoute from "@/components/Protected";
 
 const FeesReportPage = () => {
   const [year, setYear] = useState(new Date().getFullYear());
@@ -85,6 +86,7 @@ const FeesReportPage = () => {
   };
 
   return (
+    <ProtectedRoute>
     <div className="container mx-auto p-4">
       <h1 className="text-xl font-bold mb-4">Monthly Fees Report</h1>
 
@@ -292,6 +294,7 @@ const FeesReportPage = () => {
         </div>
       )}
     </div>
+    </ProtectedRoute>
   );
 };
 

@@ -1,3 +1,4 @@
+import exp from "constants";
 import { gql } from "graphql-request";
 
 export const CREATE_FEES_RECORD_MUTATION = gql`
@@ -63,6 +64,19 @@ export const GET_TEACHER_BY_ID = gql`
   }
 `;
 
+export const LOGIN_MUTATION = `
+mutation LoginTeacher($email: String!, $password: String!) {
+  loginTeacher(email: $email, password: $password) {
+    token
+    teacher {
+      id
+      username
+      email
+    }
+  }
+}
+`;
+
 export const GET_STUDENT_BY_ID_QUERY = gql`
   query GetStudentById($id: ID!) {
     getStudentById(id: $id) {
@@ -112,14 +126,25 @@ export const CREATE_STUDENT_MUTATION = gql`
   }
 `;
 
-// export const DELETE_FEES_RECORD_MUTATION = gql`
-//   mutation DeleteFeesRecord($id: ID!) {
-//     deleteFeesRecord(id: $id) {
-//       id
-//       message
-//     }
-//   }
-// `;
+export const SIGNUP_MUTATION = `
+  mutation SignupTeacher($username: String!, $email: String!, $password: String!) {
+    signupTeacher(username: $username, email: $email, password: $password) {
+      token
+      teacher {
+        id
+        username
+        email
+      }
+    }
+  }
+`;
+
+export const GET_STUDENT_LOGS_QUERY = gql`
+  query GET_STUDENT_LOGS($id: ID!) {
+  getStudentLogs(id: $id)
+}
+
+`;
 
 export const DELETE_STUDENT_MUTATION = gql`
   mutation DeleteStudent($id: ID!) {

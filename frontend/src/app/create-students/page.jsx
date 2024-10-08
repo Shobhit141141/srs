@@ -7,6 +7,7 @@ import { CREATE_STUDENT_MUTATION } from "@/queries/graphqlQueires";
 import { useNotifyAndNavigate } from "@/utils/notify_and_navigate";
 import { useRouter } from "next/navigation";
 import useClient from "@/utils/graphql";
+import ProtectedRoute from "@/components/Protected";
 
 const CreateStudentPage = () => {
   const {
@@ -36,6 +37,7 @@ const CreateStudentPage = () => {
   };
 
   return (
+    <ProtectedRoute>
     <div className="max-w-md mx-auto p-4 mb-[100px]">
       <h1 className="text-[44px] font-light mb-4">Create Student</h1>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -213,6 +215,7 @@ const CreateStudentPage = () => {
       </form>
       {message && <p className="mt-4">{message}</p>}
     </div>
+    </ProtectedRoute>
   );
 };
 

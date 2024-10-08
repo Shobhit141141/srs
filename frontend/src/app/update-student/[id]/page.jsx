@@ -9,6 +9,7 @@ import {
   GET_STUDENT_BY_ID_QUERY,
   UPDATE_STUDENT_MUTATION,
 } from "@/queries/graphqlQueires";
+import ProtectedRoute from "@/components/Protected";
 const UpdateStudentPage = ({ params }) => {
   const { id: studentId } = params;
   const {
@@ -65,6 +66,7 @@ if (client) fetchStudent(); // Fetch the student
   };
 
   return (
+    <ProtectedRoute>
     <div className="max-w-md mx-auto p-4 mb-[100px]">
       <h1 className="text-[44px] font-bold mb-4">Update Student</h1>
       {loading ? ( // Show loading spinner while data is being fetched
@@ -231,6 +233,7 @@ if (client) fetchStudent(); // Fetch the student
         </form>
       )}
     </div>
+    </ProtectedRoute>
   );
 };
 

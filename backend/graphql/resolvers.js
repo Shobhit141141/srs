@@ -118,6 +118,19 @@ const resolvers = {
         paidStudents: feesRecords,
         unpaidStudents
       };
+    },
+    async getStudentLogs(_, { id }, context) {
+      const teacher = context.teacher;
+      const student = await Student.findByPk(id);
+      if (!student) {
+        throw new Error('Student not found');
+      }
+
+      if (student.teacherId !== teacher.id) {
+        throw new Error('You are not authorized to view this student record.');
+      }
+
+      return student.logs || []; 
     }
   },
   Mutation: {
