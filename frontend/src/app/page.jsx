@@ -1,8 +1,10 @@
 // src/pages/index.js (Home page)
 import ProtectedRoute from "@/components/Protected";
 import StudentsPage from "@/components/students";
+import { useAuth } from "@/context/AuthContext";
 
 function Home() {
+
   return (
     <ProtectedRoute>
       <div>

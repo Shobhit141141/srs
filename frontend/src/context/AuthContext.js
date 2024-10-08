@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }) => {
       getTeacher(teacherId); // Fetch teacher data if ID is available
     } else {
       setLoading(false); // Set loading to false if no teacherId
-      router.push("/login"); // Redirect to login if no teacherId
+      router.push("/login");
     }
   }, [client]);
 

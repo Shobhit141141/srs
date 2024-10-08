@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Table } from "@radix-ui/themes";
 import Loader from "@/ui/Loader";
 import { Chip, Input } from "@nextui-org/react";
-import { SearchIcon } from "lucide-react";
+import { LogInIcon, SearchIcon } from "lucide-react";
 import useClient from "@/utils/graphql";
 import { useAuth } from "@/context/AuthContext";
 
@@ -32,7 +32,7 @@ const StudentsPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const client = useClient();
 
-  const {teacher} = useAuth();
+  const { teacher } = useAuth();
 
   console.log(client);
 
@@ -49,8 +49,7 @@ const StudentsPage = () => {
   };
 
   useEffect(() => {
-    if (client)
-    fetchStudents();
+    if (client) fetchStudents();
   }, [client]);
 
   useEffect(() => {
@@ -82,7 +81,6 @@ const StudentsPage = () => {
 
     setFilteredStudents(updatedStudents);
   }, [statusFilter, timeSlotFilter, searchQuery, students]);
-
   if (loading) {
     return <Loader />;
   }
@@ -94,9 +92,9 @@ const StudentsPage = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-4">
-    <h1 className="text-2xl md:text-3xl font-bold text-white">
-  Welcome <span className="text-yellow-400">🎉 {teacher.username}</span>
-</h1>
+      <h1 className="text-2xl md:text-3xl font-bold text-white">
+        Welcome <span className="text-yellow-400">🎉 {teacher?.username}</span>
+      </h1>
 
       <h1 className="text-2xl font-bold my-6 text-blue-500">All Students</h1>
 

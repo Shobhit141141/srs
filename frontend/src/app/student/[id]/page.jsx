@@ -257,6 +257,7 @@ const StudentDetailsPage = ({ params }) => {
             type="date"
             value={date_of_payment}
             onChange={(e) => setDateOfPayment(e.target.value)}
+            onClick={(e) => e.target.showPicker()}
             required
             className="p-2 rounded"
           />
