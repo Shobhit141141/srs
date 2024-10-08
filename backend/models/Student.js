@@ -1,16 +1,17 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
+const FeesRecord = require('./FeesRecord');
 const Teacher = require('./Teacher');
 const Student = sequelize.define(
   'Student',
   {
     name: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: false
     },
     joiningDate: {
       type: DataTypes.DATEONLY,
-      allowNull: false,
+      allowNull: false
     },
     contactInfo: {
       type: DataTypes.STRING,
@@ -18,21 +19,21 @@ const Student = sequelize.define(
       validate: {
         is: {
           args: /^\d{10}$/,
-          msg: 'Contact info must be a 10-digit mobile number.',
+          msg: 'Contact info must be a 10-digit mobile number.'
         },
         len: {
           args: [10, 10],
-          msg: 'Contact info must be 10 digits long.',
-        },
-      },
+          msg: 'Contact info must be 10 digits long.'
+        }
+      }
     },
     class: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: false
     },
     feesAmount: {
       type: DataTypes.FLOAT,
-      allowNull: true,
+      allowNull: true
     },
     timeSlot: {
       type: DataTypes.ENUM(
@@ -49,33 +50,33 @@ const Student = sequelize.define(
         '5 - 6 PM',
         '6 - 7 PM',
         '7 - 8 PM',
-        '8 - 9 PM'
+        '8 - 9 PM',
       ),
-      allowNull: false,
+      allowNull: false
     },
     notes: {
       type: DataTypes.TEXT,
-      allowNull: true,
+      allowNull: true
     },
-
+    
     logs: {
       type: DataTypes.JSON, // Use JSON to store an array of logs
       allowNull: true,
-      defaultValue: [], // Initialize as an empty array
+      defaultValue: [] // Initialize as an empty array
     },
     isActive: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      defaultValue: true, // Default to active
+      defaultValue: true // Default to active
     },
     teacherId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
         model: Teacher, // Reference the Teacher model
-        key: 'id',
-      },
-    },
+        key: 'id'
+      }
+    }
   },
   {}
 );

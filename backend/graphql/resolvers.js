@@ -4,6 +4,7 @@ const { Op } = require('sequelize');
 const Teacher = require('../models/Teacher');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { authMiddleware } = require('../middleware/authMiddleware');
 // Secret key for signing JWTs
 const SECRET_KEY = 'your_secret_key';
 
@@ -30,14 +31,14 @@ const resolvers = {
 
       return await Student.findAll({
         where: {
-          teacherId: teacher.id,
-        },
+          teacherId: teacher.id
+        }
       });
     },
     async getFeesRecords(_, { studentId }, context) {
       const teacher = context.teacher;
       const student = await FeesRecord.findAll({
-        where: { studentId },
+        where: { studentId }
       });
       if (!student) {
         throw new Error('Student not found');
@@ -51,23 +52,24 @@ const resolvers = {
     async studentsByTimeSlot(_, { timeSlot }) {
       const students = await Student.findAll({
         where: {
-          timeSlot,
-        },
+          timeSlot
+        }
       });
 
       return students;
     },
 
+
     getTeacherById: (_, { id }, context) => {
       const teacher = context.teacher;
 
       console.log(teacher.id);
-      console.log(id);
-      if (!teacher) {
+      console.log(id);  
+      if(!teacher) {
         throw new Error('No teachers found');
       }
       console.log(teacher.id == id);
-      if (teacher.id != id) {
+      if(teacher.id != id) {
         throw new Error('You are not authorized to view this teacher record.');
       }
       return teacher;
@@ -84,16 +86,16 @@ const resolvers = {
       const feesRecords = await FeesRecord.findAll({
         where: {
           date_of_payment: {
-            [Op.between]: [startDate, endDate],
+            [Op.between]: [startDate, endDate]
           },
-          '$Student.teacherId$': teacherId, // Ensure the student belongs to the teacher
+          '$Student.teacherId$': teacherId // Ensure the student belongs to the teacher
         },
         include: [
           {
             model: Student, // Join with the Student model
-            required: true, // Only include fees records with valid students
-          },
-        ],
+            required: true // Only include fees records with valid students
+          }
+        ]
       });
 
       // Get the student IDs who have paid fees
@@ -104,9 +106,9 @@ const resolvers = {
         where: {
           teacherId: teacherId, // Filter students by teacher
           id: {
-            [Op.notIn]: paidStudentIds,
-          },
-        },
+            [Op.notIn]: paidStudentIds
+          }
+        }
       });
 
       // Return the report
@@ -114,7 +116,7 @@ const resolvers = {
         paidFeesCount: paidStudentIds.length,
         unpaidFeesCount: unpaidStudents.length,
         paidStudents: feesRecords,
-        unpaidStudents,
+        unpaidStudents
       };
     },
     async getStudentLogs(_, { id }, context) {
@@ -128,16 +130,16 @@ const resolvers = {
         throw new Error('You are not authorized to view this student record.');
       }
 
-      return student.logs || [];
-    },
+      return student.logs || []; 
+    }
   },
   Mutation: {
     async signupTeacher(_, { username, email, password }) {
       // Check if the teacher already exists
       const existingTeacher = await Teacher.findOne({
         where: {
-          [Op.or]: [{ email }, { username }],
-        },
+          [Op.or]: [{ email }, { username }]
+        }
       });
 
       if (existingTeacher) {
@@ -151,12 +153,12 @@ const resolvers = {
       const teacher = await Teacher.create({
         username,
         email,
-        password: hashedPassword,
+        password: hashedPassword
       });
 
       // Generate a JWT token
       const token = jwt.sign({ teacherId: teacher.id }, SECRET_KEY, {
-        expiresIn: '1d',
+        expiresIn: '1d'
       });
 
       return { token, teacher };
@@ -177,7 +179,7 @@ const resolvers = {
 
       // Generate a JWT token
       const token = jwt.sign({ teacherId: teacher.id }, SECRET_KEY, {
-        expiresIn: '1d',
+        expiresIn: '1d'
       });
 
       return { token, teacher };
@@ -190,7 +192,7 @@ const resolvers = {
         class: className,
         feesAmount,
         notes,
-        timeSlot,
+        timeSlot
       } = input;
 
       if (
@@ -220,7 +222,7 @@ const resolvers = {
         notes: notes || '',
         timeSlot,
         logs: [`Student created: ${name}`],
-        teacherId: context.teacher.id,
+        teacherId: context.teacher.id
       });
     },
 
@@ -284,7 +286,7 @@ const resolvers = {
       // Update the student record and log changes
       await student.update({
         ...updates,
-        logs: [...student.logs, ...logsToUpdate],
+        logs: [...student.logs, ...logsToUpdate]
       });
 
       return student;
@@ -309,7 +311,7 @@ const resolvers = {
         logsToUpdate.push(`Made inactive at ${new Date().toLocaleString()}`);
       }
       await student.update({
-        logs: [...student.logs, ...logsToUpdate],
+        logs: [...student.logs, ...logsToUpdate]
       });
       await student.save();
 
@@ -319,7 +321,7 @@ const resolvers = {
     async deleteStudent(_, { id }, context) {
       const teacher = context.teacher;
       const feesRecords = await FeesRecord.findAll({
-        where: { studentId: id },
+        where: { studentId: id }
       });
       await Promise.all(feesRecords.map(record => record.destroy()));
 
@@ -335,8 +337,7 @@ const resolvers = {
 
     async createFeesRecord(
       _,
-      { studentId, studentName, amount, date_of_payment, status },
-      context
+      { studentId, studentName, amount, date_of_payment, status }, context
     ) {
       const teacher = context.teacher;
       const id = teacher.id;
@@ -350,7 +351,7 @@ const resolvers = {
         amount,
         date_of_payment,
         status,
-        teacherId: id,
+        teacherId: id
       };
 
       try {
@@ -363,7 +364,7 @@ const resolvers = {
 
         // Update student logs
         await student.update({
-          logs: [...student.logs, ...logsToUpdate],
+          logs: [...student.logs, ...logsToUpdate]
         });
 
         return feesRecord; // Return the created FeesRecord
@@ -379,17 +380,17 @@ const resolvers = {
 
       await feesRecord.update({
         amount: amount || feesRecord.amount,
-        status: status || feesRecord.status,
+        status: status || feesRecord.status
       });
 
       return feesRecord;
-    },
+    }
   },
   Student: {
     feesRecords: async student => {
       return await FeesRecord.findAll({ where: { studentId: student.id } });
-    },
-  },
+    }
+  }
 };
 
 module.exports = resolvers;
