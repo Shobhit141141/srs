@@ -201,8 +201,7 @@ const resolvers = {
         !contactInfo ||
         !className ||
         !timeSlot ||
-        !feesAmount ||
-        !notes
+        !feesAmount
       ) {
         throw new Error(
           'All fields are required: name, joiningDate, contactInfo, class, timeSlot.'
@@ -220,7 +219,7 @@ const resolvers = {
         contactInfo,
         class: className,
         feesAmount,
-        notes,
+        notes: notes || '',
         timeSlot,
         logs: [`Student created: ${name}`],
         teacherId: context.teacher.id

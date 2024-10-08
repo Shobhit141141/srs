@@ -49,7 +49,8 @@ const Student = sequelize.define(
         '4 - 5 PM',
         '5 - 6 PM',
         '6 - 7 PM',
-        '7 - 8 PM'
+        '7 - 8 PM',
+        '8 - 9 PM',
       ),
       allowNull: false
     },

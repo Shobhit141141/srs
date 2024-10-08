@@ -62,7 +62,7 @@ export const AuthProvider = ({ children }) => {
 
     localStorage.setItem("authToken", data.signupTeacher.token);
     localStorage.setItem("teacherId", data.signupTeacher.teacher.id);
-    notifyAndNavigate("Signup successful", "/");
+    notify_and_navigate("Signup successful", "/");
     await getTeacher(data.signupTeacher.teacher.id);
     router.push("/");
   }
