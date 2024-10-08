@@ -1,3 +1,4 @@
-const app = require('../index'); 
+const app = require("..");
+
 
 module.exports = app;
