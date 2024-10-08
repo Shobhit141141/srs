@@ -9,7 +9,8 @@ const server = new ApolloServer({
   resolvers,
   context: async ({ req }) => {
     const isAuthRequired = !(
-      req.body.operationName === 'signupTeacher' || req.body.operationName === 'loginTeacher'
+      req.body.operationName === 'signupTeacher' ||
+      req.body.operationName === 'loginTeacher'
     );
 
     if (isAuthRequired) {
@@ -21,9 +22,8 @@ const server = new ApolloServer({
     }
 
     return { req };
-  }
+  },
 });
-
 
 const startServer = server.start();
 

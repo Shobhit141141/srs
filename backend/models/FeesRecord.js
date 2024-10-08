@@ -11,33 +11,33 @@ const FeesRecord = sequelize.define(
       allowNull: false,
       references: {
         model: Student, // reference the Student model
-        key: 'id'
-      }
+        key: 'id',
+      },
     },
     studentName: {
       type: DataTypes.STRING,
-      allowNull: true
+      allowNull: true,
     },
     amount: {
       type: DataTypes.FLOAT,
-      allowNull: false
+      allowNull: false,
     },
     date_of_payment: {
       type: DataTypes.DATE,
-      allowNull: false
+      allowNull: false,
     },
     status: {
       type: DataTypes.STRING,
-      allowNull: false
+      allowNull: false,
     },
     teacherId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
         model: Teacher,
-        key: 'id'
-      }
-    }
+        key: 'id',
+      },
+    },
   },
   {}
 );

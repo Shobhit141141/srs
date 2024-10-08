@@ -2,14 +2,17 @@ const jwt = require('jsonwebtoken');
 const Teacher = require('../models/Teacher');
 const SECRET_KEY = 'your_secret_key'; // Make sure this is securely stored
 
-const authMiddleware = async (req) => {
+const authMiddleware = async req => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {
     throw new Error('Authorization header is missing.');
   }
 
-  if (req.body.operationName === 'SignupTeacher' || req.body.operationName === 'LoginTeacher') {
+  if (
+    req.body.operationName === 'SignupTeacher' ||
+    req.body.operationName === 'LoginTeacher'
+  ) {
     return {};
   }
 
