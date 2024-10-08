@@ -28,7 +28,7 @@ const startServer = server.start();
 
 module.exports = async function handler(req, res) {
   await startServer;
-  await server.createHandler({ path: '/api/graphql' })(req, res);
+  await server.createHandler({ path: '/api/graphQl' })(req, res);
 };
 
 // Disable bodyParser, ApolloServer already does this
