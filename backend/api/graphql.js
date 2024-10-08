@@ -24,6 +24,7 @@ const server = new ApolloServer({
   }
 });
 
+
 const startServer = server.start();
 
 module.exports = async function handler(req, res) {
