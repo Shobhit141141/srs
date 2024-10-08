@@ -9,11 +9,11 @@ const authMiddleware = require('./middleware/authMiddleware');
 
 const app = express();
 app.use(morgan('dev'));
+
 const server = new ApolloServer({
   typeDefs,
   resolvers,
   context: async ({ req }) => {
-    // Only apply the auth middleware if it's not a signup or login request
     const isAuthRequired = !(
       req.body.operationName === 'signupTeacher' || req.body.operationName === 'loginTeacher'
     );
@@ -24,21 +24,24 @@ const server = new ApolloServer({
         throw new Error('Authentication token is missing or invalid.');
       }
       console.log('context teacher:', teacher.id);
-      return { teacher, req }; // Return the teacher in the context
+      return { teacher, req };
     }
 
-    return { req }; // No teacher in context for login/signup
-  }
+    return { req };
+  },
 });
 
-server.start().then(() => {
+// Start the Apollo server
+const startServer = async () => {
+  await server.start();
   server.applyMiddleware({ app });
 
-  sequelize.sync().then(() => {
-    app.listen(4000, () => {
-      console.log(
-        `Server is running at http://localhost:4000${server.graphqlPath}`
-      );
-    });
-  });
-});
+  // Sync the database
+  await sequelize.sync();
+};
+
+// Vercel requires an exportable function
+module.exports = async (req, res) => {
+  await startServer();
+  app(req, res); // Call the express app
+};
