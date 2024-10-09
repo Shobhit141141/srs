@@ -1,43 +1,30 @@
 const express = require('express');
-const { ApolloServer } = require('apollo-server-express');
-const sequelize = require('./config/db');
-
-const typeDefs = require('./graphql/typeDefs');
-const resolvers = require('./graphql/resolvers');
 const morgan = require('morgan');
-const authMiddleware = require('./middleware/authMiddleware');
+const cors = require('cors');
+const sequelize = require('./config/db');
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 const app = express();
+
+app.use(cors());
+app.use(express.json());
 app.use(morgan('dev'));
-const server = new ApolloServer({
-  typeDefs,
-  resolvers,
-  context: async ({ req }) => {
-    const isAuthRequired = !(
-      req.body.operationName === 'signupTeacher' || req.body.operationName === 'loginTeacher'
-    );
 
-    if (isAuthRequired) {
-      const teacher = await authMiddleware(req);
-      if (!teacher) {
-        throw new Error('Authentication token is missing or invalid.');
-      }
-      console.log('context teacher:', teacher.id);
-      return { teacher, req };
-    }
+const studentRoutes = require('./routes/studentRoutes');
+const teacherRoutes = require('./routes/teacherRoutes');
+const feesRecordRoutes = require('./routes/feesrecordRoutes');
 
-    return { req };
-  }
+app.use('/api/students', studentRoutes);
+app.use('/api/teachers', teacherRoutes);
+app.use('/api/fees', feesRecordRoutes);
+app.get('/', (req, res) => {
+  res.send('Welcome to the API');
 });
 
-server.start().then(() => {
-  server.applyMiddleware({ app });
-
-  sequelize.sync().then(() => {
-    app.listen(4000, () => {
-      console.log(
-        `Server is running at http://localhost:4000${server.graphqlPath}`
-      );
-    });
+sequelize.sync().then(() => {
+  app.listen(4000, () => {
+    console.log(`Server is running at http://localhost:4000`);
   });
 });

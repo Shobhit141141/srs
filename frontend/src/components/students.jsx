@@ -5,22 +5,8 @@ import { Table } from "@radix-ui/themes";
 import Loader from "@/ui/Loader";
 import { Chip, Input } from "@nextui-org/react";
 import { LogInIcon, SearchIcon } from "lucide-react";
-import useClient from "@/utils/graphql";
 import { useAuth } from "@/context/AuthContext";
-
-const GET_ALL_STUDENTS_QUERY = `
-  query {
-    getAllStudents {
-      id
-      name
-      contactInfo
-      class
-      timeSlot
-      joiningDate
-      isActive
-    }
-  }
-`;
+import useApi, { getAllStudents } from "@/apis/api";
 
 const StudentsPage = () => {
   const [students, setStudents] = useState([]);
@@ -30,17 +16,16 @@ const StudentsPage = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [timeSlotFilter, setTimeSlotFilter] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const client = useClient();
 
   const { teacher } = useAuth();
 
-  console.log(client);
-
+  const { getAllStudents } = useApi();
   const fetchStudents = async () => {
     try {
-      const response = await client.request(GET_ALL_STUDENTS_QUERY);
-      setStudents(response.getAllStudents);
-      setFilteredStudents(response.getAllStudents);
+      const response = await getAllStudents();
+      console.log(response);
+      setStudents(response);
+      setFilteredStudents(response);
     } catch (error) {
       setError(`Error fetching students: ${error.message}`);
     } finally {
@@ -49,8 +34,8 @@ const StudentsPage = () => {
   };
 
   useEffect(() => {
-    if (client) fetchStudents();
-  }, [client]);
+  fetchStudents();
+  }, []);
 
   useEffect(() => {
     let updatedStudents = students;
@@ -77,7 +62,7 @@ const StudentsPage = () => {
     }
 
     // Sort by time slot
-    updatedStudents.sort((a, b) => (a.timeSlot > b.timeSlot ? 1 : -1));
+    updatedStudents?.sort((a, b) => (a.timeSlot > b.timeSlot ? 1 : -1));
 
     setFilteredStudents(updatedStudents);
   }, [statusFilter, timeSlotFilter, searchQuery, students]);
@@ -87,7 +72,7 @@ const StudentsPage = () => {
   // if (error) return <p className="text-red-500">{error}</p>;
 
   const uniqueTimeSlots = [
-    ...new Set(students.map((student) => student.timeSlot)),
+    ...new Set(students?.map((student) => student.timeSlot)),
   ];
 
   return (
@@ -161,7 +146,7 @@ const StudentsPage = () => {
         onChange={(e) => setSearchQuery(e.target.value)}
       />
 
-      {filteredStudents.length === 0 ? (
+      {filteredStudents?.length === 0 ? (
         <div className="border rounded-lg shadow-sm p-4 my-4 bg-red-700 font-bold text-center">
           No Student found
         </div>
@@ -180,7 +165,7 @@ const StudentsPage = () => {
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {filteredStudents.map((student, index) => (
+            {filteredStudents?.map((student, index) => (
               <Table.Row key={student.id} className="cursor-pointer">
                 <Table.ColumnHeaderCell>{index + 1}</Table.ColumnHeaderCell>
                 <Table.ColumnHeaderCell className="hover:text-blue-400 hover:underline">

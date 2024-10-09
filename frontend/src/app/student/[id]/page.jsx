@@ -1,21 +1,13 @@
 "use client";
 import { useEffect, useState } from "react";
-import {
-  CREATE_FEES_RECORD_MUTATION,
-  DELETE_STUDENT_MUTATION,
-  GET_STUDENT_BY_ID_QUERY,
-  GET_STUDENT_LOGS_QUERY,
-  TOGGLE_ACTIVE_STATUS_MUTATION,
-} from "@/queries/graphqlQueires";
+import useApi from "@/apis/api";
 import { useNotifyAndNavigate } from "@/utils/notify_and_navigate";
 import { Badge, Button } from "@radix-ui/themes";
 import { Edit2Icon, Phone, Trash2 } from "lucide-react";
 import Loader from "@/ui/Loader";
 import { Chip, Input } from "@nextui-org/react";
 import Link from "next/link";
-import useClient from "@/utils/graphql";
 import ProtectedRoute from "@/components/Protected";
-import { set } from "react-hook-form";
 
 const StudentDetailsPage = ({ params }) => {
   const { id } = params;
@@ -28,14 +20,19 @@ const StudentDetailsPage = ({ params }) => {
   const [loading, setLoading] = useState(true);
   const [logs, setLogs] = useState([]);
   const notifyAndNavigate = useNotifyAndNavigate();
-  const client = useClient();
-
+  const {
+    getStudentById,
+    getStudentLogs,
+    createFeesRecord,
+    toggleStudentActive,
+    deleteStudent,
+  } = useApi();
   useEffect(() => {
     const fetchStudent = async () => {
       try {
-        const response = await client.request(GET_STUDENT_BY_ID_QUERY, { id });
-        setStudent(response.getStudentById);
-        setFeesRecords(response.getStudentById.feesRecords || []);
+        const response = await getStudentById(id);
+        setStudent(response.student);
+        setFeesRecords(response.feesRecords || []);
       } catch (error) {
         console.error("Error fetching student:", error);
       } finally {
@@ -43,41 +40,36 @@ const StudentDetailsPage = ({ params }) => {
       }
     };
 
-  
-
-    if (client) {
-      fetchStudent();
-  
-    }
-  }, [id, client]);
+    fetchStudent();
+  }, [id]);
 
   const fetchLogs = async () => {
     try {
-      const response = await client.request(GET_STUDENT_LOGS_QUERY, { id });
-      setLogs(response.getStudentLogs);
+      const response = await getStudentLogs(id);
+      setLogs(response);
     } catch (error) {
       console.error("Error fetching logs:", error);
     }
   };
 
   useEffect(() => {
-    if (client) {
-      fetchLogs();
-    }
-  }, [id,client]);
+    fetchLogs();
+  }, [id]);
 
   const handleFeesRecordSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const newRecord = await client.request(CREATE_FEES_RECORD_MUTATION, {
+      const data = {
         studentId: id,
         studentName: student.name,
         amount: parseFloat(amount),
         date_of_payment,
         status,
-      });
-      setFeesRecords([...feesRecords, newRecord.createFeesRecord]);
+      };
+
+      const newRecord = await createFeesRecord(data);
+      setFeesRecords([...feesRecords, newRecord]);
       setAmount("");
       setDateOfPayment("");
       setStatus("");
@@ -89,7 +81,7 @@ const StudentDetailsPage = ({ params }) => {
 
   const handleDeleteStudent = async () => {
     try {
-      await client.request(DELETE_STUDENT_MUTATION, { id });
+      await deleteStudent(id);
       notifyAndNavigate("Student deleted successfully!", "/");
     } catch (error) {
       console.error("Error deleting student:", error);
@@ -98,15 +90,10 @@ const StudentDetailsPage = ({ params }) => {
 
   const toggleActiveStatus = async () => {
     try {
-      const updatedStudent = await client.request(
-        TOGGLE_ACTIVE_STATUS_MUTATION,
-        {
-          id,
-        }
-      );
+      const updatedStudent = await toggleStudentActive(id);
       setStudent((prev) => ({
         ...prev,
-        isActive: updatedStudent.toggleStudentActive.isActive,
+        isActive: updatedStudent.isActive,
       }));
       await fetchLogs();
     } catch (error) {

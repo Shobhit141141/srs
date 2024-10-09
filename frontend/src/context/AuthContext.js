@@ -1,8 +1,7 @@
 "use client";
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { GraphQLClient } from "graphql-request";
-import useClient from "@/utils/graphql";
-import { GET_TEACHER_BY_ID, LOGIN_MUTATION, SIGNUP_MUTATION } from "@/queries/graphqlQueires";
+
+import useApi from "@/apis/api";
 import { useRouter } from "next/navigation";
 import { useNotifyAndNavigate } from "@/utils/notify_and_navigate";
 
@@ -11,27 +10,26 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [teacher, setTeacher] = useState(null);
   const [loading, setLoading] = useState(true);
-  const client = useClient(); // Get the client directly from the hook
   const router = useRouter();
+  const {signupTeacher , loginTeacher, getTeacherById} = useApi();
   const notify_and_navigate = useNotifyAndNavigate();
 
   useEffect(() => {
     const teacherId = localStorage.getItem("teacherId");
     if (teacherId) {
-      getTeacher(teacherId); // Fetch teacher data if ID is available
+      getTeacher(teacherId);
     } else {
-      setLoading(false); // Set loading to false if no teacherId
+      setLoading(false);
       router.push("/login");
     }
-  }, [client]);
+  }, []);
 
   const getTeacher = async (id) => {
     try {
       setLoading(true);
-      if (!client) return;
-      const response = await client.request(GET_TEACHER_BY_ID, { id });
+      const response = await getTeacherById(id);
       notify_and_navigate("Welcome back!", "/");
-      setTeacher(response.getTeacherById);
+      setTeacher(response);
     } catch (error) {
       console.error("Error fetching teacher:", error);
     } finally {
@@ -41,11 +39,10 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const data = await client.request(LOGIN_MUTATION, { email, password });
-      localStorage.setItem("authToken", data.loginTeacher.token);
-      localStorage.setItem("teacherId", data.loginTeacher.teacher.id);
-
-      await getTeacher(data.loginTeacher.teacher.id);
+      const data = await loginTeacher(email, password);
+      localStorage.setItem("authToken", data.token);
+      localStorage.setItem("teacherId", data.teacher.id);
+      setTeacher(data.teacher);
       notify_and_navigate("Login successful", "/");
       router.push("/");
     } catch (error) {
@@ -54,16 +51,13 @@ export const AuthProvider = ({ children }) => {
   };
 
   const signup = async (username, email, password) => {
-    const data = await client.request(SIGNUP_MUTATION, {
-      username,
-      email,
-      password,
-    });
+    const data = await signupTeacher(username, email, password);
 
-    localStorage.setItem("authToken", data.signupTeacher.token);
-    localStorage.setItem("teacherId", data.signupTeacher.teacher.id);
+    localStorage.setItem("authToken", data.token);
+    localStorage.setItem("teacherId", data.teacher.id);
+    // setToken(data.signupTeacher.token);
     notify_and_navigate("Signup successful", "/");
-    await getTeacher(data.signupTeacher.teacher.id);
+    await getTeacher(data.teacher.id);
     router.push("/");
   }
 

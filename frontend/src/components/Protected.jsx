@@ -5,18 +5,19 @@ import { useEffect } from "react";
 import Loader from "@/ui/Loader";
 
 const ProtectedRoute = ({ children }) => {
-  const { teacher,loading } = useAuth();
+  const { teacher, loading } = useAuth();
   const router = useRouter();
-  console.log("teacher", teacher);
+  
   useEffect(() => {
+    // Only redirect to login if loading is complete and teacher is not authenticated
     if (!loading && !teacher) {
-      // Redirect to login if not authenticated
+      localStorage.setItem("intendedRoute", window.location.pathname);
       router.push("/login");
     }
-  }, [teacher, router]);
+  }, [teacher, loading, router]);
 
-  // While checking auth, you can return null or a loading spinner
-  if (!teacher) return <Loader/>;
+  // While checking auth, you can return a loading spinner
+  if (loading) return <Loader/>;
 
   return children;
 };

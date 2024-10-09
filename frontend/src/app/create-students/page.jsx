@@ -1,12 +1,10 @@
 "use client";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
-import client from "@/utils/graphql";
 import { Button } from "@nextui-org/react";
-import { CREATE_STUDENT_MUTATION } from "@/queries/graphqlQueires";
+import useApi from "@/apis/api";
 import { useNotifyAndNavigate } from "@/utils/notify_and_navigate";
 import { useRouter } from "next/navigation";
-import useClient from "@/utils/graphql";
 import ProtectedRoute from "@/components/Protected";
 import { Loader2 } from "lucide-react";
 import Loader from "@/ui/Loader";
@@ -21,9 +19,9 @@ const CreateStudentPage = () => {
   } = useForm();
   const [message, setMessage] = useState("");
   const notifyAndNavigate = useNotifyAndNavigate();
-  const client = useClient();
-  const [loading, setLoading] = useState(true);
 
+  const [loading, setLoading] = useState(true);
+  const { createStudent } = useApi();
   const onSubmit = async (data) => {
     try {
       const formattedData = {
@@ -31,13 +29,11 @@ const CreateStudentPage = () => {
         feesAmount: parseFloat(data.feesAmount),
       };
 
-      const response = await client.request(CREATE_STUDENT_MUTATION, {
-        input: formattedData,
-      });
+      await createStudent(formattedData);
       notifyAndNavigate("Student created successfully", "/");
     } catch (error) {
       setMessage(`Error: ${error.message}`);
-    } finally{
+    } finally {
       setLoading(false);
     }
   };
@@ -208,7 +204,7 @@ const CreateStudentPage = () => {
               type="submit"
               className="bg-blue-500 text-white p-2 rounded hover:text-white"
             >
-              {!loading ? <Spinner/> : "Create"}
+              {!loading ? <Spinner /> : "Create"}
             </Button>
 
             {/* Clear Button */}
