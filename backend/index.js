@@ -14,7 +14,7 @@ app.use(morgan('dev'));
 
 const studentRoutes = require('./routes/studentRoutes');
 const teacherRoutes = require('./routes/teacherRoutes');
-const feesRecordRoutes = require('./routes/feesrecordRoutes');
+const feesRecordRoutes = require('./routes/feesRecordRoutes');
 
 app.use('/api/students', studentRoutes);
 app.use('/api/teachers', teacherRoutes);
