@@ -1,6 +1,4 @@
-"use client";
 import axios from "axios";
-import { useEffect } from "react";
 
 const API_URL = "https://srs-toqc.onrender.com/api";
 
@@ -10,11 +8,8 @@ const api = axios.create({
 
 // Create a separate function to manage API calls
 const useApi = () => {
-  let token = null;
-  useEffect(() => {
-     token = localStorage.getItem("authToken");
-    
-  }, []);
+  
+  const token = typeof window !== "undefined" ? localStorage.getItem("authToken") : null;
   
   // Create Fees Record ✅
   const createFeesRecord = async (data) => {
