@@ -1,5 +1,6 @@
-
+"use client";
 import axios from "axios";
+import { useEffect } from "react";
 
 const API_URL = "https://srs-toqc.onrender.com/api";
 
@@ -9,8 +10,12 @@ const api = axios.create({
 
 // Create a separate function to manage API calls
 const useApi = () => {
-  const token = localStorage.getItem("authToken");
-
+  let token = null;
+  useEffect(() => {
+     token = localStorage.getItem("authToken");
+    
+  }, []);
+  
   // Create Fees Record ✅
   const createFeesRecord = async (data) => {
     try {
@@ -160,21 +165,20 @@ const useApi = () => {
   const getMonthlyFeesReport = async (year, month) => {
     try {
       const response = await api.post(
-        '/fees/monthly', 
+        "/fees/monthly",
         { year, month }, // Ensure the correct structure
         {
           headers: {
-            Authorization: `Bearer ${token}`, 
+            Authorization: `Bearer ${token}`,
           },
         }
       );
-      return response.data; 
+      return response.data;
     } catch (error) {
       throw new Error(`Failed to get monthly fees report: ${error.message}`);
     }
-};
+  };
 
-  
   return {
     createFeesRecord,
     updateStudent,
