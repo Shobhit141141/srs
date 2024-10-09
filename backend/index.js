@@ -30,14 +30,14 @@ const server = new ApolloServer({
   }
 });
 
-async function startServer() {
-  await server.start();
+server.start().then(() => {
   server.applyMiddleware({ app });
 
-  // Sync Sequelize models
-  await sequelize.sync();
-}
-
-// Call the function to start the server
-startServer();
-module.exports = app;
+  sequelize.sync().then(() => {
+    app.listen(4000, () => {
+      console.log(
+        `Server is running at http://localhost:4000${server.graphqlPath}`
+      );
+    });
+  });
+});
