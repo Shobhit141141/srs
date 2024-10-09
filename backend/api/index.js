@@ -1,11 +1,11 @@
 const express = require('express');
 const { ApolloServer } = require('apollo-server-express');
-const sequelize = require('../config/db');
+const sequelize = require('./config/db');
 
-const typeDefs = require('../graphql/typeDefs');
-const resolvers = require('../graphql/resolvers');
+const typeDefs = require('./graphql/typeDefs');
+const resolvers = require('./graphql/resolvers');
 const morgan = require('morgan');
-const authMiddleware = require('../middleware/authMiddleware');
+const authMiddleware = require('./middleware/authMiddleware');
 
 const app = express();
 app.use(morgan('dev'));
