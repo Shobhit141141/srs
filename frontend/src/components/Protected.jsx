@@ -9,15 +9,14 @@ const ProtectedRoute = ({ children }) => {
   const router = useRouter();
   
   useEffect(() => {
-    // Only redirect to login if loading is complete and teacher is not authenticated
+    // Redirect to login if not authenticated and loading is complete
     if (!loading && !teacher) {
-      localStorage.setItem("intendedRoute", window.location.pathname);
       router.push("/login");
     }
   }, [teacher, loading, router]);
 
-  // While checking auth, you can return a loading spinner
-  if (loading) return <Loader/>;
+  // While checking auth, return a loading spinner
+  if (loading) return <Loader />;
 
   return children;
 };

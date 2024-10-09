@@ -1,9 +1,9 @@
 "use client";
 import React, { createContext, useContext, useEffect, useState } from "react";
-
 import useApi from "@/apis/api";
 import { useRouter } from "next/navigation";
 import { useNotifyAndNavigate } from "@/utils/notify_and_navigate";
+import toast from "react-hot-toast";
 
 const AuthContext = createContext();
 
@@ -11,7 +11,7 @@ export const AuthProvider = ({ children }) => {
   const [teacher, setTeacher] = useState(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-  const {signupTeacher , loginTeacher, getTeacherById} = useApi();
+  const { signupTeacher, loginTeacher, getTeacherById } = useApi();
   const notify_and_navigate = useNotifyAndNavigate();
 
   useEffect(() => {
@@ -20,7 +20,6 @@ export const AuthProvider = ({ children }) => {
       getTeacher(teacherId);
     } else {
       setLoading(false);
-      router.push("/login");
     }
   }, []);
 
@@ -28,8 +27,8 @@ export const AuthProvider = ({ children }) => {
     try {
       setLoading(true);
       const response = await getTeacherById(id);
-      notify_and_navigate("Welcome back!", "/");
       setTeacher(response);
+      toast.success("Welcome Back 🎉")
     } catch (error) {
       console.error("Error fetching teacher:", error);
     } finally {
@@ -44,7 +43,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("teacherId", data.teacher.id);
       setTeacher(data.teacher);
       notify_and_navigate("Login successful", "/");
-      router.push("/");
+      router.push("/"); // Redirect to homepage or intended page
     } catch (error) {
       console.error("Login failed:", error);
     }
@@ -52,15 +51,12 @@ export const AuthProvider = ({ children }) => {
 
   const signup = async (username, email, password) => {
     const data = await signupTeacher(username, email, password);
-
     localStorage.setItem("authToken", data.token);
     localStorage.setItem("teacherId", data.teacher.id);
-    // setToken(data.signupTeacher.token);
+    setTeacher(data.teacher);
     notify_and_navigate("Signup successful", "/");
-    await getTeacher(data.teacher.id);
-    router.push("/");
-  }
-
+    router.push("/"); // Redirect to homepage or intended page
+  };
 
   const logout = () => {
     localStorage.removeItem("authToken");
