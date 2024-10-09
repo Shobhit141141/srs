@@ -69,7 +69,7 @@ const StudentDetailsPage = ({ params }) => {
       };
 
       const newRecord = await createFeesRecord(data);
-      setFeesRecords([...feesRecords, newRecord]);
+      setFeesRecords([...feesRecords, newRecord.feesRecord]);
       setAmount("");
       setDateOfPayment("");
       setStatus("");
