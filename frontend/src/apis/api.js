@@ -1,9 +1,7 @@
-"use client";
-import { useAuth } from "@/context/AuthContext";
-import axios from "axios";
-import { useEffect, useState } from "react";
 
-const API_URL = "http://localhost:4000/api";
+import axios from "axios";
+
+const API_URL = "https://srs-toqc.onrender.com/api";
 
 const api = axios.create({
   baseURL: API_URL,
