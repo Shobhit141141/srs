@@ -22,6 +22,7 @@ const UpdateStudentPage = ({ params }) => {
   const [originalData, setOriginalData] = useState(null);
   const [loading, setLoading] = useState(true); // Loading state
   const { getStudentById, updateStudent } = useApi();
+  const [onSubmitLoading, setOnSubmitLoading] = useState(false);
   useEffect(() => {
     const fetchStudent = async () => {
       setLoading(true); // Start loading
@@ -30,9 +31,11 @@ const UpdateStudentPage = ({ params }) => {
         console.log("response", response);
         setOriginalData(response);
 
-        // Set form values
-        for (const key in response) {
-          setValue(key, response[key]);
+        const { student } = response;
+
+        // Set form values based on the student object
+        for (const key in student) {
+          setValue(key, student[key]);
         }
       } catch (error) {
         setMessage(`Error: ${error.message}`);
@@ -45,15 +48,18 @@ const UpdateStudentPage = ({ params }) => {
 
   const onSubmit = async (data) => {
     try {
+      setOnSubmitLoading(true);
       const formattedData = {
         ...data,
         feesAmount: parseFloat(data.feesAmount),
       };
 
       await updateStudent(studentId, formattedData);
-      notifyAndNavigate("Student updated successfully", "/");
+      notifyAndNavigate("Student updated successfully", `/student/${studentId}`);
     } catch (error) {
       setMessage(`Error: ${error.message}`);
+    } finally{
+      setOnSubmitLoading(false);
     }
   };
 
@@ -205,7 +211,7 @@ const UpdateStudentPage = ({ params }) => {
                     type="submit"
                     className="bg-blue-500 text-white p-2 rounded hover:text-white"
                   >
-                    Update Student
+                    {onSubmitLoading ? ". . ." : "Update"}
                   </Button>
 
                   {/* Clear Button */}

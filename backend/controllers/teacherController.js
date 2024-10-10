@@ -17,7 +17,7 @@ const createTeacher = async (req, res) => {
     const token = jwt.sign(
         { id: teacher.id, username: teacher.username },
         SECRET_KEY,
-        { expiresIn: '1h' }
+        { expiresIn: '7d' }
       );
     res.status(201).json({ message: 'Teacher created successfully', teacher ,token });
   } catch (error) {
@@ -38,7 +38,7 @@ const loginTeacher = async (req, res) => {
     const token = jwt.sign(
       { id: teacher.id, username: teacher.username },
       SECRET_KEY,
-      { expiresIn: '1h' }
+      { expiresIn: '7d' }
     );
     res.json({ message: 'Login successful', teacher ,token });
   } catch (error) {

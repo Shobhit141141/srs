@@ -72,27 +72,27 @@ const updateStudent = async (req, res) => {
 
   if (name && name !== student.name) {
     updates.name = name;
-    logs.push(`Updated name from ${student.name} to ${name}`);
+    logs.push(`Updated name from ${student.name} to ${name} : ${new Date().toLocaleString()}`);
   }
   if (contactInfo && contactInfo !== student.contactInfo) {
     updates.contactInfo = contactInfo;
-    logs.push(`Updated contact info`);
+    logs.push(`Updated contact info from ${student.contactInfo} to ${contactInfo} : ${new Date().toLocaleString()}`);
   }
   if (className && className !== student.class) {
     updates.class = className;
-    logs.push(`Updated class`);
+    logs.push(`Updated class from ${student.class} to ${className} : ${new Date().toLocaleString()}`);
   }
   if (feesAmount !== undefined && feesAmount !== student.feesAmount) {
     updates.feesAmount = feesAmount;
-    logs.push(`Updated fees`);
+    logs.push(`Updated fees amount from ₹ ${student.feesAmount} to ₹ ${feesAmount} : ${new Date().toLocaleString()}`);
   }
   if (timeSlot && timeSlot !== student.timeSlot) {
     updates.timeSlot = timeSlot;
-    logs.push(`Updated timeSlot`);
+    logs.push(`Updated timeSlot from ${student.timeSlot} to ${timeSlot} : ${new Date().toLocaleString()}`);
   }
   if (notes && notes !== student.notes) {
     updates.notes = notes;
-    logs.push(`Updated notes`);
+    logs.push(`Updated notes added ${notes} : ${new Date().toLocaleString()}`);
   }
 
   await student.update({ ...updates, logs: [...student.logs, ...logs] });

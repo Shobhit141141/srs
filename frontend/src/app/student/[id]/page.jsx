@@ -247,6 +247,7 @@ const StudentDetailsPage = ({ params }) => {
             onClick={(e) => e.target.showPicker()}
             required
             className="p-2 rounded"
+            placeholder="Date"
           />
           <Input
             type="text"

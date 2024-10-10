@@ -1,7 +1,7 @@
 import axios from "axios";
 import toast from "react-hot-toast";
 
-const API_URL = "https://srs-toqc.onrender.com/api";
+const API_URL = "http://localhost:4000/api";
 
 const api = axios.create({
   baseURL: API_URL,
