@@ -40,8 +40,8 @@ const CreateStudentPage = () => {
 
   return (
     <ProtectedRoute>
-      <div className="max-w-md mx-auto p-4 mb-[100px]">
-        <h1 className="text-[44px] font-light mb-4">Create Student</h1>
+      <div className="max-w-md h-max mx-auto p-4 mb-[100px] overflow-y-auto">
+        <h1 className="text-[44px] font-light mb-4 text-nowrap">Add Student</h1>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
             <label htmlFor="name" className="block text-gray-300">
