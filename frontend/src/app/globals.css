@@ -75,6 +75,7 @@ body {
   padding: 0;
   min-height: 100vh;
   height: max-content;
+  font-family: Arial, Helvetica, sans-serif !important;
 
   /* Hide scrollbar but don't change overflow */
   ::-webkit-scrollbar {
@@ -83,6 +84,8 @@ body {
 
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
+
+ 
 }
 
 #__next {

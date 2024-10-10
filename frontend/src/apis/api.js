@@ -1,6 +1,7 @@
 import axios from "axios";
+import toast from "react-hot-toast";
 
-const API_URL = "https://srs-toqc.onrender.com/api";
+const API_URL = "http://localhost:4000/api";
 
 const api = axios.create({
   baseURL: API_URL,
@@ -54,9 +55,27 @@ const useApi = () => {
   const loginTeacher = async (email, password) => {
     try {
       const response = await api.post("/teachers/login", { email, password });
-      return response.data;
+  
+      // If login is successful
+      if (response.status === 200) {
+        toast.success("Login successful!");
+        return response.data;  // Use the returned data as needed
+      }
     } catch (error) {
-      throw new Error(`Failed to log in teacher: ${error.message}`);
+      // Handle errors during the API call
+      if (error.response) {
+        // Handle known error status codes (like 401 for invalid credentials)
+        if (error.response.status === 401) {
+          toast.error(error.response.data?.message || "Invalid email or password");
+        } else {
+          toast.error(`Error: ${error.response.data?.message || "Something went wrong!"}`);
+        }
+      } else {
+        // Handle network or unknown errors
+        toast.error("An error occurred while logging in. Please try again later.");
+      }
+  
+      console.error("Error logging in teacher:", error);
     }
   };
   // Get student by ID ✅

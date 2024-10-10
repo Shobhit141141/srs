@@ -204,7 +204,7 @@ const CreateStudentPage = () => {
               type="submit"
               className="bg-blue-500 text-white p-2 rounded hover:text-white"
             >
-              {!loading ? <Spinner /> : "Create"}
+              {!loading ? ". . ." : "Create"}
             </Button>
 
             {/* Clear Button */}

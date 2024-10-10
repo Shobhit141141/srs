@@ -17,7 +17,12 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const teacherId = localStorage.getItem("teacherId");
     if (teacherId) {
-      getTeacher(teacherId);
+      const res = getTeacher(teacherId);
+      if (res) {
+        setLoading(true);
+      } else {
+        logout();
+      }
     } else {
       setLoading(false);
     }

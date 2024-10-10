@@ -5,11 +5,13 @@ import { useRouter } from "next/navigation";
 import Loader from "@/ui/Loader";
 import Link from "next/link";
 import { Input } from "@nextui-org/react";
+import toast from "react-hot-toast";
 
 const Signup = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [signupLoading, setSignupLoading] = useState(false);
   const { teacher, loading, signup } = useAuth();
   const router = useRouter();
 
@@ -56,9 +58,12 @@ const Signup = () => {
 
     if (valid) {
       try {
-        await signup(username, email, password);
+        setSignupLoading(true);
+        const res = await signup(username, email, password);
       } catch (error) {
-        alert(error.message);
+        toast.error(error);
+      } finally{
+        setSignupLoading(false);
       }
     }
   };
@@ -121,7 +126,7 @@ const Signup = () => {
           onClick={handleSignup}
           className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
-          Sign Up
+          {signupLoading ? ". . ." : "Sign up"}
         </button>
 
         <div className="mt-6 flex gap-2 justify-start items-center">
