@@ -312,7 +312,7 @@ const StudentDetailsPage = ({ params }) => {
               logs.map((log, index) => (
                 <div key={index} value={`item-${index}`}>
                   <div
-                    className={`p-2 font-mono ${
+                    className={`p-2 mono_font ${
                       log.includes("Made active")
                         ? "text-green-500"
                         : log.includes("Made inactive")
