@@ -67,6 +67,9 @@
   }
 }
 
+* {
+  font-family: Arial, Helvetica, sans-serif !important;
+}
 html,
 body {
   background-color: rgb(17, 17, 17) !important;
@@ -75,7 +78,7 @@ body {
   padding: 0;
   min-height: 100vh;
   height: max-content;
-  font-family: Arial, Helvetica, sans-serif !important;
+
 
   /* Hide scrollbar but don't change overflow */
   ::-webkit-scrollbar {
