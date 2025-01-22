@@ -92,7 +92,7 @@ const Login = () => {
         </button>
 
         <div className="mt-6 flex gap-2 justify-start items-center">
-          <p>Don't have an account?</p>
+          <p>Don&apos;t have an account?</p>
           <Link href="/signup" className="text-blue-500 hover:underline">
             Signup
           </Link>
